@@ -1,1 +1,25 @@
-<p>confirm-modal works!</p>
+@if (confirmacion.pendiente(); as pendiente) {
+  <div class="modal-backdrop fade show"></div>
+  <div class="modal d-block" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">{{ pendiente.titulo }}</h5>
+        </div>
+
+        <div class="modal-body">
+          <p class="mb-0">{{ pendiente.mensaje }}</p>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="confirmacion.cancelar()">
+            No
+          </button>
+          <button type="button" class="btn btn-danger" (click)="confirmacion.aceptar()">
+            Sí
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+}

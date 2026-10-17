@@ -1,1 +1,28 @@
-/* You can add global styles to this file, and also import other style files */
+// ============================================================
+// src/styles.scss
+// Estilos globales de toda la app
+// Este archivo es de Oscar
+// ============================================================
+
+//  :root significa toda la página
+// así que cualquier .scss puede usarlas con var(--nombre).
+:root {
+  --pns-color-primario: #6f42c1; 
+  --pns-color-secundario: #20c997; 
+  --pns-color-oscuro: #212529; 
+  --pns-color-fondo: #f4f5f9; 
+  --pns-color-tarjeta: #ffffff; 
+}
+
+// Fondo general de la app. Bootstrap pone blanco por defecto.
+body {
+  background-color: var(--pns-color-fondo);
+}
+
+// Clase reutilizable para tarjetas (juegos, usuarios, grupos)
+.pns-tarjeta {
+  background-color: var(--pns-color-tarjeta);
+  border: 0;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}

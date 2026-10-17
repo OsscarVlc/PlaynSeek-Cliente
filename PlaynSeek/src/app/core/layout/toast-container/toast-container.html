@@ -1,1 +1,20 @@
-<p>toast-container works!</p>
+<div class="toast-zona">
+
+  @for (toast of notificacion.toasts(); track toast.id) {
+    <div
+      class="alert d-flex justify-content-between align-items-center shadow"
+      [class.alert-success]="toast.tipo === 'exito'"
+      [class.alert-danger]="toast.tipo === 'error'"
+      [class.alert-info]="toast.tipo === 'info'"
+      [class.alert-warning]="toast.tipo === 'advertencia'"
+    >
+      <span>{{ toast.mensaje }}</span>
+
+      <button
+        type="button"
+        class="btn-close ms-3"
+        (click)="notificacion.cerrar(toast.id)"
+      ></button>
+    </div>
+  }
+</div>

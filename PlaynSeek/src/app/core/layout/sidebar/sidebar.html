@@ -1,1 +1,48 @@
-<p>sidebar works!</p>
+<aside class="bg-light border-end p-3">
+  <div class="list-group">
+
+    <a class="list-group-item list-group-item-action"
+       routerLink="/dashboard" routerLinkActive="active">
+      <i class="bi bi-speedometer2 me-2"></i>Dashboard
+    </a>
+
+    <a class="list-group-item list-group-item-action"
+       routerLink="/juegos" routerLinkActive="active">
+      <i class="bi bi-controller me-2"></i>Juegos
+    </a>
+
+    <a class="list-group-item list-group-item-action"
+       routerLink="/grupos" routerLinkActive="active">
+      <i class="bi bi-people me-2"></i>Grupos
+    </a>
+
+    <a class="list-group-item list-group-item-action"
+       routerLink="/match/recomendaciones" routerLinkActive="active">
+      <i class="bi bi-heart me-2"></i>Recomendaciones
+    </a>
+
+    <a class="list-group-item list-group-item-action"
+       routerLink="/match/solicitudes" routerLinkActive="active">
+      <i class="bi bi-envelope me-2"></i>Solicitudes
+    </a>
+
+    <a class="list-group-item list-group-item-action"
+       routerLink="/match/mis-matches" routerLinkActive="active">
+      <i class="bi bi-chat-dots me-2"></i>Mis matches
+    </a>
+
+    @if (auth.tieneRol(['administrador', 'moderador'])) {
+      <a class="list-group-item list-group-item-action"
+         routerLink="/moderacion/reportes" routerLinkActive="active">
+        <i class="bi bi-flag me-2"></i>Reportes
+      </a>
+    }
+
+    @if (auth.tieneRol(['administrador'])) {
+      <a class="list-group-item list-group-item-action"
+         routerLink="/admin/usuarios" routerLinkActive="active">
+        <i class="bi bi-shield-lock me-2"></i>Usuarios
+      </a>
+    }
+  </div>
+</aside>

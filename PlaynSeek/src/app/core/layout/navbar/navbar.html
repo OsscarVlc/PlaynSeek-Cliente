@@ -1,1 +1,10 @@
-<p>navbar works!</p>
+<nav class="navbar navbar-dark bg-dark px-3">
+  <a class="navbar-brand" routerLink="/dashboard">Play N Seek</a>
+  <div class="d-flex align-items-center gap-3">
+    <span class="text-light">{{ auth.usuarioActual?.nombre }}</span>
+    <a class="btn btn-outline-light btn-sm" routerLink="/perfil">Mi perfil</a>
+    <button type="button" class="btn btn-outline-danger btn-sm" (click)="salir()">
+      Cerrar sesión
+    </button>
+  </div>
+</nav>
