@@ -1,1 +1,157 @@
-<p>solicitudes works!</p>
+<section class="match-list-page" aria-labelledby="titulo-solicitudes">
+  <header class="page-header">
+    <p class="eyebrow">EL SIGUIENTE PASO PARA CONECTAR</p>
+    <h1 id="titulo-solicitudes">Tus solicitudes</h1>
+    <p>Revisa quién quiere jugar contigo y las invitaciones que enviaste.</p>
+  </header>
+
+  <nav class="match-nav" aria-label="Secciones de Match">
+    <a routerLink="/match/recomendaciones">Recomendaciones</a>
+    <a routerLink="/match/solicitudes" class="activa" aria-current="page">
+      Solicitudes
+    </a>
+    <a routerLink="/match/mis-matches">Mis matches</a>
+  </nav>
+
+  @if (aviso()) {
+    <div class="aviso" role="status">
+      <span>{{ aviso() }}</span>
+      <button type="button" (click)="aviso.set('')" aria-label="Cerrar aviso">
+        Cerrar
+      </button>
+    </div>
+  }
+
+  <div class="filtros" role="group" aria-label="Tipo de solicitudes">
+    <button
+      type="button"
+      [class.seleccionado]="tabActual() === 'recibidas'"
+      [attr.aria-pressed]="tabActual() === 'recibidas'"
+      (click)="tabActual.set('recibidas')"
+    >
+      Recibidas ({{ recibidas().length }})
+    </button>
+
+    <button
+      type="button"
+      [class.seleccionado]="tabActual() === 'enviadas'"
+      [attr.aria-pressed]="tabActual() === 'enviadas'"
+      (click)="tabActual.set('enviadas')"
+    >
+      Enviadas ({{ enviadas().length }})
+    </button>
+  </div>
+
+  @if (tabActual() === 'recibidas') {
+    <div class="tarjetas">
+      @for (solicitud of recibidas(); track solicitud.id) {
+        <article class="persona-card">
+          <div class="persona-header">
+            <span class="avatar" aria-hidden="true">
+              {{ solicitud.jugador.iniciales }}
+            </span>
+            <div>
+              <h2>{{ solicitud.jugador.nombre }}</h2>
+              <p class="detalle-secundario">
+                {{ solicitud.jugador.idiomas.join(' · ') }}
+              </p>
+            </div>
+          </div>
+
+          <p class="descripcion">{{ solicitud.jugador.descripcion }}</p>
+
+          <div class="etiquetas">
+            @for (juego of solicitud.jugador.juegos; track juego) {
+              <span>{{ juego }}</span>
+            }
+          </div>
+
+          <p class="detalle-secundario">
+            {{ solicitud.jugador.disponibilidad }}
+          </p>
+
+          <time class="fecha" [attr.datetime]="solicitud.fecha">
+            Recibida el {{ solicitud.fecha | date:'dd/MM/yyyy HH:mm' }}
+          </time>
+
+          <div class="acciones">
+            <button
+              type="button"
+              class="boton-principal"
+              [attr.aria-label]="'Aceptar solicitud de ' + solicitud.jugador.nombre"
+              (click)="responder(solicitud.id, true)"
+            >
+              Aceptar
+            </button>
+
+            <button
+              type="button"
+              class="boton-secundario"
+              [attr.aria-label]="'Rechazar solicitud de ' + solicitud.jugador.nombre"
+              (click)="responder(solicitud.id, false)"
+            >
+              Rechazar
+            </button>
+          </div>
+        </article>
+      } @empty {
+        <div class="estado-vacio">
+          <h2>No tienes solicitudes recibidas pendientes</h2>
+          <p>Mientras llegan nuevas invitaciones, puedes descubrir jugadores.</p>
+          <a routerLink="/match/recomendaciones" class="enlace">
+            Explorar recomendaciones
+          </a>
+        </div>
+      }
+    </div>
+  } @else {
+    <div class="tarjetas">
+      @for (solicitud of enviadas(); track solicitud.id) {
+        <article class="persona-card">
+          <div class="persona-header">
+            <span class="avatar" aria-hidden="true">
+              {{ solicitud.jugador.iniciales }}
+            </span>
+            <div>
+              <h2>{{ solicitud.jugador.nombre }}</h2>
+              <p class="detalle-secundario">
+                {{ solicitud.jugador.idiomas.join(' · ') }}
+              </p>
+            </div>
+          </div>
+
+          <div class="etiquetas">
+            @for (juego of solicitud.jugador.juegos; track juego) {
+              <span>{{ juego }}</span>
+            }
+          </div>
+
+          <p class="estado-pendiente">Pendiente de respuesta</p>
+
+          <time class="fecha" [attr.datetime]="solicitud.fecha">
+            Enviada el {{ solicitud.fecha | date:'dd/MM/yyyy HH:mm' }}
+          </time>
+
+          <div class="acciones">
+            <button
+              type="button"
+              class="boton-secundario"
+              [attr.aria-label]="'Cancelar solicitud a ' + solicitud.jugador.nombre"
+              (click)="cancelar(solicitud.id)"
+            >
+              Cancelar solicitud
+            </button>
+          </div>
+        </article>
+      } @empty {
+        <div class="estado-vacio">
+          <h2>No tienes solicitudes enviadas pendientes</h2>
+          <p>Encuentra a alguien con quien compartir tu próxima partida.</p>
+          <a routerLink="/match/recomendaciones" class="enlace">
+            Buscar jugadores
+          </a>
+        </div>
+      }
+    </div>
+  }
+</section>

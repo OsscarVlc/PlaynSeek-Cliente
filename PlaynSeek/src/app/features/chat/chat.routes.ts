@@ -14,5 +14,6 @@ export const CHAT_ROUTES: Routes = [
   // ":id" es el id del usuario con el que se chatea (tu match),
   // igual que en el back, donde la sala privada se arma con los
   // dos ids de los usuarios.
+  { path: '', component: ChatPrivado, pathMatch: 'full' },
   { path: ':id', component: ChatPrivado },
 ];

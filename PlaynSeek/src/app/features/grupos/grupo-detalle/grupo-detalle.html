@@ -1,1 +1,455 @@
-<p>grupo-detalle works!</p>
+<section class="detalle-page">
+  <a routerLink="/grupos" class="volver">← Volver a grupos</a>
+
+  @if (grupo(); as grupoActual) {
+    <header
+      class="portada"
+      [class.portada-verde]="grupoActual.tono === 'verde'"
+      [class.portada-rosa]="grupoActual.tono === 'rosa'"
+    >
+      @if (grupoActual.imagen) {
+        <img class="portada-imagen" [src]="grupoActual.imagen" alt="" />
+      }
+
+      <div class="portada-contenido">
+        <span class="etiqueta">{{ grupoActual.juego }}</span>
+        <h1>{{ grupoActual.nombre }}</h1>
+        <p class="descripcion">{{ grupoActual.descripcion }}</p>
+
+        <div class="datos-grupo">
+          <span>{{ grupoActual.integrantes.length }} integrantes</span>
+
+          @if (esIntegrante()) {
+            <span class="miembro">● Eres integrante</span>
+          }
+        </div>
+
+        <div class="acciones-pertenencia">
+            @if (esIntegrante()) {
+                <button type="button" class="boton-secundario" (click)="salir()">
+                Salir del grupo
+                </button>
+            } @else {
+                <button type="button" class="boton-principal" (click)="unirse()">
+                Unirme al grupo
+                </button>
+            }
+        </div>
+
+      </div>
+    </header>
+
+    @if (aviso()) {
+        <div class="aviso" role="status">
+            <span>{{ aviso() }}</span>
+            <button
+            type="button"
+            aria-label="Cerrar aviso"
+            (click)="aviso.set('')"
+            >
+            ×
+            </button>
+        </div>
+        }
+
+    <nav class="tabs" aria-label="Secciones del grupo">
+      <button
+        type="button"
+        [class.activa]="tabActual() === 'posts'"
+        [attr.aria-pressed]="tabActual() === 'posts'"
+        (click)="seleccionarTab('posts')"
+      >
+        Posts
+      </button>
+
+      <button
+        type="button"
+        [class.activa]="tabActual() === 'chat'"
+        [attr.aria-pressed]="tabActual() === 'chat'"
+        (click)="seleccionarTab('chat')"
+      >
+        Chat
+      </button>
+
+      <button
+        type="button"
+        [class.activa]="tabActual() === 'integrantes'"
+        [attr.aria-pressed]="tabActual() === 'integrantes'"
+        (click)="seleccionarTab('integrantes')"
+      >
+        Integrantes
+        <span>{{ grupoActual.integrantes.length }}</span>
+      </button>
+    </nav>
+
+    @switch (tabActual()) {
+      @case ('posts') {
+        <section aria-label="Publicaciones">
+          @if (esIntegrante()) {
+            <form class="panel editor" (ngSubmit)="publicar(imagenPostInput)">
+              <h2>Comparte con tu comunidad</h2>
+
+              <label class="campo-label" for="nuevo-post">
+                Nueva publicación
+              </label>
+
+              <textarea
+                id="nuevo-post"
+                name="nuevoPost"
+                [(ngModel)]="nuevoPost"
+                rows="3"
+                maxlength="2000"
+                placeholder="¿Quién se apunta a una partida?"
+              ></textarea>
+
+              <div class="adjunto-post">
+                <label class="campo-label" for="imagen-post">
+                    Agregar imagen
+                </label>
+
+                <input
+                    #imagenPostInput
+                    id="imagen-post"
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    [disabled]="leyendoImagenPost()"
+                    (change)="seleccionarImagenPost($event)"
+                    aria-describedby="imagen-post-ayuda"
+                />
+
+                <small id="imagen-post-ayuda">JPG, PNG o WebP. Máximo 5 MB.</small>
+
+                @if (leyendoImagenPost()) {
+                    <p role="status">Preparando imagen…</p>
+                }
+
+                @if (errorImagenPost()) {
+                    <p class="error-adjunto" role="alert">{{ errorImagenPost() }}</p>
+                }
+
+                @if (imagenPost(); as imagen) {
+                    <div class="preview-post">
+                    <img [src]="imagen" alt="Vista previa de la imagen que publicarás" />
+
+                    <button
+                        type="button"
+                        class="boton-secundario"
+                        [disabled]="leyendoImagenPost()"
+                        (click)="quitarImagenPost(imagenPostInput)"
+                    >
+                        Quitar imagen
+                    </button>
+                    </div>
+                }
+                </div>
+
+              <div class="editor-footer">
+                <small>Visible para los integrantes del grupo</small>
+                <button
+                  class="boton-principal"
+                  type="submit"
+                  [disabled]="!nuevoPost.trim() || leyendoImagenPost()"
+                >
+                  Publicar
+                </button>
+              </div>
+            </form>
+
+            <h2 class="titulo-seccion">El muro</h2>
+
+            <div class="publicaciones">
+              @for (post of postsDelGrupo(); track post.id) {
+                <article class="panel publicacion">
+                  <header class="autor">
+                    <span class="avatar" aria-hidden="true">SO</span>
+                    <div>
+                      <strong>{{ post.autor }}</strong>
+                      <time [attr.datetime]="post.fecha.toISOString()">
+                        {{ post.fecha | date:'dd/MM/yyyy HH:mm' }}
+                      </time>
+                    </div>
+                  </header>
+
+                  <p class="texto-publicado">{{ post.contenido }}</p>
+                  @if (post.imagen; as imagen) {
+                    <img
+                        class="imagen-publicada"
+                        [src]="imagen"
+                        [alt]="'Imagen publicada por ' + post.autor"
+                    />
+                    }
+
+                    <section
+                    class="comentarios-post"
+                    [attr.aria-label]="'Comentarios de la publicación de ' + post.autor"
+                    >
+                    <h3>
+                        {{ post.comentarios.length }}
+                        {{ post.comentarios.length === 1 ? 'comentario' : 'comentarios' }}
+                    </h3>
+
+                    <div class="lista-comentarios">
+                        @for (comentario of post.comentarios; track comentario.id) {
+                        <article class="comentario">
+                            <header>
+                            <strong>{{ comentario.autor }}</strong>
+                            <time [attr.datetime]="comentario.fecha.toISOString()">
+                                {{ comentario.fecha | date:'dd/MM HH:mm' }}
+                            </time>
+                            </header>
+
+                            <p>{{ comentario.contenido }}</p>
+                        </article>
+                        } @empty {
+                        <p class="sin-comentarios">Sé el primero en comentar.</p>
+                        }
+                    </div>
+
+                    <form class="comentario-form" (ngSubmit)="comentar(post.id)">
+                        <label class="campo-label" [for]="'comentario-' + post.id">
+                        Tu comentario
+                        </label>
+
+                        <div class="chat-input">
+                        <input
+                            [id]="'comentario-' + post.id"
+                            [name]="'comentario-' + post.id"
+                            [(ngModel)]="borradoresComentarios[post.id]"
+                            maxlength="500"
+                            placeholder="Escribe un comentario..."
+                        />
+
+                        <button
+                            type="submit"
+                            class="boton-principal"
+                            [disabled]="!(borradoresComentarios[post.id] ?? '').trim()"
+                        >
+                            Comentar
+                        </button>
+                        </div>
+                    </form>
+                    </section>
+                </article>
+              } @empty {
+                <div class="estado-vacio">
+                  <h3>La conversación empieza contigo</h3>
+                  <p>Publica el primer mensaje de esta comunidad.</p>
+                </div>
+              }
+            </div>
+          } @else {
+            <div class="estado-vacio">
+              <h2>Contenido para integrantes</h2>
+              <p>Debes pertenecer al grupo para consultar y publicar posts.</p>
+            </div>
+          }
+        </section>
+      }
+
+      @case ('chat') {
+        <section class="panel chat" aria-label="Chat del grupo">
+          <header class="chat-header">
+            <h2>Chat de {{ grupoActual.nombre }}</h2>
+            <p>Organicen su próxima partida.</p>
+          </header>
+
+          @if (esIntegrante()) {
+            <div
+              class="mensajes"
+              role="log"
+              aria-label="Mensajes del grupo"
+              aria-live="polite"
+              aria-relevant="additions"
+            >
+              @for (mensaje of mensajesDelGrupo(); track mensaje.id) {
+                <article
+                  class="mensaje"
+                  [class.propio]="mensaje.autorId === usuarioActualId"
+                >
+                  <strong>{{ mensaje.autor }}</strong>
+                  <p>{{ mensaje.contenido }}</p>
+                  <time [attr.datetime]="mensaje.fecha.toISOString()">
+                    {{ mensaje.fecha | date:'HH:mm' }}
+                  </time>
+                </article>
+              } @empty {
+                <div class="estado-vacio">
+                  <h3>Todavía no hay mensajes</h3>
+                  <p>Saluda a tu equipo para comenzar.</p>
+                </div>
+              }
+            </div>
+
+            <form class="chat-form" (ngSubmit)="enviarMensaje()">
+              <label class="campo-label" for="mensaje-grupo">Tu mensaje</label>
+
+              <div class="chat-input">
+                <input
+                  id="mensaje-grupo"
+                  name="nuevoMensaje"
+                  [(ngModel)]="nuevoMensaje"
+                  maxlength="1000"
+                  placeholder="Escribe un mensaje..."
+                  autocomplete="off"
+                />
+
+                <button
+                  type="submit"
+                  class="boton-principal"
+                  [disabled]="!nuevoMensaje.trim()"
+                >
+                  Enviar
+                </button>
+              </div>
+            </form>
+          } @else {
+            <div class="estado-vacio">
+              <p>Debes pertenecer al grupo para participar en el chat.</p>
+            </div>
+          }
+        </section>
+      }
+
+      @case ('integrantes') {
+        <section class="panel" aria-labelledby="titulo-integrantes">
+            <h2 id="titulo-integrantes">Conoce a tu equipo</h2>
+
+            @if (confirmacion(); as pendiente) {
+            <div class="confirmacion">
+                <p>
+                @if (pendiente.accion === 'transferir') {
+                    ¿Quieres transferir el liderazgo a
+                    <strong>{{ pendiente.nombre }}</strong>?
+                    Dejarás de tener los permisos de líder.
+                } @else {
+                    ¿Quieres retirar del grupo a
+                    <strong>{{ pendiente.nombre }}</strong>?
+                }
+                </p>
+
+                <div class="acciones-integrante">
+                <button
+                    type="button"
+                    class="boton-principal"
+                    (click)="confirmarAccion()"
+                >
+                    Confirmar
+                </button>
+
+                <button
+                    type="button"
+                    class="boton-secundario"
+                    (click)="confirmacion.set(null)"
+                >
+                    Cancelar
+                </button>
+                </div>
+            </div>
+            }
+
+            @if (usuarioReportado(); as reportado) {
+            <form class="reporte-form" (ngSubmit)="enviarReporte()">
+                <h3>Reportar a {{ reportado.nombre }}</h3>
+
+                <label class="campo-label" for="motivo-reporte">
+                Describe el motivo
+                </label>
+
+                <textarea
+                id="motivo-reporte"
+                name="motivoReporte"
+                [(ngModel)]="motivoReporte"
+                rows="3"
+                maxlength="500"
+                required
+                ></textarea>
+
+                <div class="acciones-integrante">
+                <button
+                    type="submit"
+                    class="boton-principal"
+                    [disabled]="!motivoReporte.trim()"
+                >
+                    Simular reporte
+                </button>
+
+                <button
+                    type="button"
+                    class="boton-secundario"
+                    (click)="usuarioReportado.set(null)"
+                >
+                    Cancelar
+                </button>
+                </div>
+            </form>
+            }
+
+            <ul class="lista-integrantes">
+            @for (integrante of grupoActual.integrantes; track integrante.id) {
+                <li>
+                <div class="autor">
+                    <span class="avatar" aria-hidden="true">
+                    {{ integrante.iniciales }}
+                    </span>
+
+                    <div>
+                    <strong>{{ integrante.nombre }}</strong>
+
+                    <div class="insignias">
+                        @if (integrante.id === grupoActual.liderId) {
+                        <span class="etiqueta-lider">Líder</span>
+                        }
+
+                        @if (integrante.id === usuarioActualId) {
+                        <span class="etiqueta-tu">Tú</span>
+                        }
+                    </div>
+                    </div>
+                </div>
+
+                @if (integrante.id !== usuarioActualId) {
+                    <div class="acciones-integrante">
+                    @if (esLider()) {
+                        <button
+                        type="button"
+                        class="boton-secundario"
+                        (click)="pedirConfirmacion('transferir', integrante)"
+                        >
+                        Hacer líder
+                        </button>
+
+                        <button
+                        type="button"
+                        class="boton-peligro"
+                        (click)="pedirConfirmacion('expulsar', integrante)"
+                        >
+                        Expulsar
+                        </button>
+                    }
+
+                    <button
+                        type="button"
+                        class="boton-secundario"
+                        (click)="abrirReporte(integrante)"
+                    >
+                        Reportar
+                    </button>
+                    </div>
+                }
+                </li>
+            }
+            </ul>
+        </section>
+      }
+    }
+  } @else {
+    <div class="estado-vacio">
+      <h1>No encontramos este grupo</h1>
+      <p>
+        Puede que el enlace no exista o que el grupo de prueba se haya perdido
+        al recargar la aplicación.
+      </p>
+      <a routerLink="/grupos" class="enlace">Explorar grupos</a>
+    </div>
+  }
+</section>

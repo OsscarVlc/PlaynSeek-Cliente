@@ -1,1 +1,93 @@
-<p>mis-matches works!</p>
+<section class="match-list-page" aria-labelledby="titulo-mis-matches">
+  <header class="page-header">
+    <p class="eyebrow">TU EQUIPO SIGUE CRECIENDO</p>
+    <h1 id="titulo-mis-matches">Mis matches</h1>
+    <p>Todas tus conexiones, listas para organizar una nueva partida.</p>
+  </header>
+
+  <nav class="match-nav" aria-label="Secciones de Match">
+    <a routerLink="/match/recomendaciones">Recomendaciones</a>
+    <a routerLink="/match/solicitudes">Solicitudes</a>
+    <a routerLink="/match/mis-matches" class="activa" aria-current="page">
+      Mis matches
+    </a>
+  </nav>
+
+  <div class="herramientas">
+    <p class="contador" role="status">
+      Mostrando {{ matchesVisibles().length }} de {{ matches().length }} matches
+    </p>
+
+    <div class="buscador">
+      <label for="buscar-match">Buscar match</label>
+      <input
+        #buscador
+        id="buscar-match"
+        type="search"
+        placeholder="Nombre o juego..."
+        [value]="busqueda()"
+        (input)="busqueda.set(buscador.value)"
+      />
+    </div>
+  </div>
+
+  <div class="tarjetas">
+    @for (jugador of matchesVisibles(); track jugador.id) {
+      <article class="persona-card">
+        <div class="persona-header">
+          <span class="avatar" aria-hidden="true">
+            {{ jugador.iniciales }}
+          </span>
+
+          <div>
+            <h2>{{ jugador.nombre }}</h2>
+            <p class="detalle-secundario">
+              {{ jugador.idiomas.join(' · ') }}
+            </p>
+          </div>
+        </div>
+
+        <p class="descripcion">{{ jugador.descripcion }}</p>
+
+        <div class="etiquetas">
+          @for (juego of jugador.juegos; track juego) {
+            <span>{{ juego }}</span>
+          }
+        </div>
+
+        <p class="detalle-secundario">{{ jugador.disponibilidad }}</p>
+
+        <div class="acciones">
+          <button
+            type="button"
+            class="boton-principal"
+            [attr.aria-label]="'Abrir chat con ' + jugador.nombre"
+            (click)="abrirChat(jugador)"
+          >
+            Abrir chat
+          </button>
+        </div>
+      </article>
+    } @empty {
+      <div class="estado-vacio">
+        @if (matches().length === 0) {
+          <h2>Aquí aparecerá tu próximo equipo</h2>
+          <p>Cuando una solicitud sea aceptada, encontrarás aquí a tu match.</p>
+          <a routerLink="/match/recomendaciones" class="enlace">
+            Explorar recomendaciones
+          </a>
+        } @else {
+          <h2>No encontramos coincidencias</h2>
+          <p>Prueba con otro nombre o juego.</p>
+          <button
+            type="button"
+            class="boton-secundario"
+            (click)="busqueda.set('')"
+          >
+            Limpiar búsqueda
+          </button>
+        }
+      </div>
+    }
+  </div>
+</section>
