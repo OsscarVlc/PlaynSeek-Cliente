@@ -1,1 +1,125 @@
-<p>grupos-lista works!</p>
+<section class="grupos-page" aria-labelledby="titulo-grupos">
+  <header class="page-header">
+    <div>
+      <p class="eyebrow">ENCUENTRA TU COMUNIDAD</p>
+      <h1 id="titulo-grupos">
+        Más que una partida.<br />
+        Tu próximo equipo.
+      </h1>
+      <p class="introduccion">
+        Conoce comunidades que convierten «una partida más» en una buena costumbre.
+      </p>
+    </div>
+
+    <a class="crear-grupo" routerLink="/grupos/nuevo">
+      <span aria-hidden="true">+</span>
+      Crear grupo
+    </a>
+  </header>
+
+  <div class="herramientas">
+    <div class="filtros" role="group" aria-label="Filtrar grupos">
+      <button
+        type="button"
+        [class.seleccionado]="filtro() === 'todos'"
+        [attr.aria-pressed]="filtro() === 'todos'"
+        (click)="filtro.set('todos')"
+      >
+        Todos
+      </button>
+
+      <button
+        type="button"
+        [class.seleccionado]="filtro() === 'mios'"
+        [attr.aria-pressed]="filtro() === 'mios'"
+        (click)="filtro.set('mios')"
+      >
+        Mis grupos
+      </button>
+    </div>
+
+    <div class="buscador">
+      <label for="buscar-grupo">Buscar comunidad</label>
+      <input
+        #buscador
+        id="buscar-grupo"
+        type="search"
+        placeholder="Nombre o juego..."
+        [value]="busqueda()"
+        (input)="busqueda.set(buscador.value)"
+      />
+    </div>
+  </div>
+
+  <p class="resultados" role="status">
+    {{ gruposVisibles().length }}
+    {{ gruposVisibles().length === 1 ? 'comunidad encontrada' : 'comunidades encontradas' }}
+  </p>
+
+  <div class="grupos-grid">
+    @for (grupo of gruposVisibles(); track grupo.id) {
+      <article class="grupo-card">
+        <div
+          class="portada"
+          [class.portada-verde]="grupo.tono === 'verde'"
+          [class.portada-rosa]="grupo.tono === 'rosa'"
+        >
+          @if (grupo.imagen) {
+            <img [src]="grupo.imagen" alt="" />
+          }
+
+          <span class="simbolo" aria-hidden="true">
+            {{ grupo.nombre.charAt(0) }}
+          </span>
+
+          <span class="juego">{{ grupo.juego }}</span>
+        </div>
+
+        <div class="card-contenido">
+          <h2>
+            <a [routerLink]="['/grupos', grupo.id]">
+              {{ grupo.nombre }}
+            </a>
+          </h2>
+
+          <p class="integrantes-total">
+            {{ grupo.integrantes.length }}
+            {{ grupo.integrantes.length === 1 ? 'integrante' : 'integrantes' }}
+          </p>
+
+          <p class="descripcion">{{ grupo.descripcion }}</p>
+
+          <footer class="card-footer">
+            <div class="avatares" aria-label="Algunos integrantes">
+              @for (integrante of grupo.integrantes.slice(0, 3); track integrante.id) {
+                <span
+                  class="avatar"
+                  [title]="integrante.nombre"
+                  [attr.aria-label]="integrante.nombre"
+                >
+                  {{ integrante.iniciales }}
+                </span>
+              }
+            </div>
+
+            <a
+              class="ver-grupo"
+              [routerLink]="['/grupos', grupo.id]"
+              [attr.aria-label]="'Ver grupo ' + grupo.nombre"
+            >
+              Ver grupo <span aria-hidden="true">↗</span>
+            </a>
+          </footer>
+        </div>
+      </article>
+    } @empty {
+      <div class="estado-vacio">
+        <h2>No encontramos comunidades</h2>
+        <p>Prueba otra búsqueda o explora todos los grupos.</p>
+        <button type="button" (click)="limpiarFiltros()">
+          Ver todos los grupos
+        </button>
+      </div>
+    }
+  </div>
+</section>

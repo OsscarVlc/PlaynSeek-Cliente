@@ -7,7 +7,7 @@ import { Sidebar } from '../sidebar/sidebar';
 
 @Component({
   selector: 'app-portal-layout',
-  imports: [RouterOutlet, Navbar, Sidebar],
+  imports: [RouterOutlet, Navbar, Sidebar],       
   templateUrl: './portal-layout.html',
   styleUrl: './portal-layout.scss',
 })

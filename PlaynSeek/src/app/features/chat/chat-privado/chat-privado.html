@@ -1,1 +1,150 @@
-<p>chat-privado works!</p>
+<section
+  class="chat-page"
+  [class.conversacion-abierta]="usuarioSeleccionadoId() !== null"
+  aria-label="Mensajes privados"
+>
+  <aside class="conversaciones">
+    <header class="lista-header">
+      <p class="eyebrow">TU PRÓXIMA PARTIDA EMPIEZA AQUÍ</p>
+      <h1>Mensajes</h1>
+
+      <label for="buscar-conversacion">Buscar conversación</label>
+      <input
+        #buscador
+        id="buscar-conversacion"
+        type="search"
+        placeholder="Nombre o juego..."
+        [value]="busqueda()"
+        (input)="busqueda.set(buscador.value)"
+      />
+    </header>
+
+    <nav class="lista-chats" aria-label="Conversaciones privadas">
+      @for (chat of conversacionesVisibles(); track chat.usuarioId) {
+        <a
+          class="conversacion-item"
+          [class.seleccionada]="usuarioSeleccionadoId() === chat.usuarioId"
+          [attr.aria-current]="
+            usuarioSeleccionadoId() === chat.usuarioId ? 'page' : null
+          "
+          [routerLink]="['/chat', chat.usuarioId]"
+        >
+          <span class="avatar" aria-hidden="true">{{ chat.iniciales }}</span>
+
+          <div class="resumen">
+            <strong>{{ chat.nombre }}</strong>
+            <span class="juego">{{ chat.juego }}</span>
+
+            @if (chat.mensajes.at(-1); as ultimo) {
+              <p>
+                @if (ultimo.autorId === usuarioActualId) {
+                  Tú:
+                }
+                {{ ultimo.contenido }}
+              </p>
+            } @else {
+              <p>Comienza la conversación</p>
+            }
+          </div>
+        </a>
+      } @empty {
+        <p class="sin-resultados">No encontramos conversaciones.</p>
+      }
+    </nav>
+
+    <footer class="lista-footer">
+      Conversaciones de demostración
+    </footer>
+  </aside>
+
+  <div class="zona-chat">
+    @if (conversacion(); as actual) {
+      <header class="chat-header">
+        <a class="volver-chats" routerLink="/chat">← Conversaciones</a>
+
+        <div class="contacto">
+          <span class="avatar" aria-hidden="true">{{ actual.iniciales }}</span>
+
+          <div>
+            <h2>{{ actual.nombre }}</h2>
+            <p>{{ actual.juego }}</p>
+          </div>
+        </div>
+
+        <span class="etiqueta-privado">Chat privado</span>
+      </header>
+
+      <div class="historial">
+        <p class="inicio-chat">
+          Coincidieron en Play N Seek. Ahora toca organizar la partida.
+        </p>
+
+        <div
+          class="mensajes"
+          role="log"
+          [attr.aria-label]="'Mensajes con ' + actual.nombre"
+          aria-live="polite"
+          aria-relevant="additions"
+        >
+          @for (mensaje of actual.mensajes; track mensaje.id) {
+            <article
+              class="mensaje"
+              [class.propio]="mensaje.autorId === usuarioActualId"
+            >
+              <span class="autor">
+                {{ mensaje.autorId === usuarioActualId ? 'Tú' : actual.nombre }}
+              </span>
+
+              <p>{{ mensaje.contenido }}</p>
+
+              <time [attr.datetime]="mensaje.fecha">
+                {{ mensaje.fecha | date:'dd/MM HH:mm' }}
+              </time>
+            </article>
+          } @empty {
+            <div class="estado-vacio">
+              <h3>Rompe el hielo</h3>
+              <p>Saluda a {{ actual.nombre }} y propón una partida.</p>
+            </div>
+          }
+        </div>
+      </div>
+
+      <form class="editor-mensaje" (ngSubmit)="enviar()">
+        <label for="mensaje-privado">Tu mensaje</label>
+
+        <div class="entrada-mensaje">
+          <input
+            id="mensaje-privado"
+            name="mensaje"
+            [(ngModel)]="borradores[actual.usuarioId]"
+            maxlength="1000"
+            autocomplete="off"
+            placeholder="Escribe un mensaje..."
+          />
+
+          <button
+            type="submit"
+            [disabled]="!(borradores[actual.usuarioId] ?? '').trim()"
+          >
+            Enviar 
+          </button>
+        </div>
+
+        <small>Presiona Enter para enviar. Máximo 1000 caracteres.</small>
+      </form>
+    } @else {
+      <div class="estado-vacio bienvenida">
+        @if (usuarioSeleccionadoId()) {
+          <h2>No encontramos esta conversación</h2>
+          <p>Este usuario todavía no está en los datos de demostración.</p>
+          <a routerLink="/chat">Volver a conversaciones</a>
+        } @else {
+          <span class="simbolo-chat" aria-hidden="true">↗</span>
+          <h2>Una conversación. Una nueva partida.</h2>
+          <p>Selecciona a alguien de la lista para comenzar.</p>
+        }
+      </div>
+    }
+  </div>
+</section>

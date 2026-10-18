@@ -1,1 +1,128 @@
-<p>grupo-form works!</p>
+<section class="form-page" aria-labelledby="titulo-crear">
+  <a routerLink="/grupos" class="volver">← Volver a grupos</a>
+
+  <header>
+    <p class="eyebrow">TU COMUNIDAD EMPIEZA AQUÍ</p>
+    <h1 id="titulo-crear">Crea tu próximo equipo.</h1>
+    <p class="subtitulo">
+      Dale un nombre, comparte la idea e invita a otros a jugar.
+    </p>
+  </header>
+
+  <form [formGroup]="formulario" (ngSubmit)="guardar()">
+    <div class="form-grid">
+      <div class="campos">
+        <div class="campo">
+          <label for="nombre">Nombre del grupo <span>*</span></label>
+
+          <input
+            id="nombre"
+            type="text"
+            formControlName="nombre"
+            maxlength="60"
+            placeholder="Ej. Valorant Nocturno"
+            aria-describedby="nombre-ayuda"
+            [attr.aria-invalid]="
+              formulario.controls.nombre.touched &&
+              formulario.controls.nombre.invalid
+            "
+          />
+
+          <small id="nombre-ayuda">
+            Un nombre que identifique a tu comunidad. Máximo 60 caracteres.
+          </small>
+
+          @if (
+            formulario.controls.nombre.touched &&
+            formulario.controls.nombre.invalid
+          ) {
+            <p class="error" role="alert">
+              Escribe un nombre válido; no puede contener solo espacios.
+            </p>
+          }
+        </div>
+
+        <div class="campo">
+          <label for="descripcion">Descripción</label>
+
+          <textarea
+            id="descripcion"
+            formControlName="descripcion"
+            rows="6"
+            maxlength="500"
+            placeholder="¿Qué juegan? ¿Qué tipo de compañeros buscan?"
+            aria-describedby="descripcion-ayuda"
+          ></textarea>
+
+          <small id="descripcion-ayuda">
+            {{ formulario.controls.descripcion.value.length }} / 500 caracteres
+          </small>
+        </div>
+
+        <p class="nota">
+          Al crear el grupo, formarás parte de sus integrantes.
+          Los datos de esta demostración se guardan durante la sesión de la app.
+        </p>
+      </div>
+
+      <div class="imagen-campo">
+        <label for="imagen-grupo">Imagen del grupo</label>
+
+        <div class="preview">
+          @if (imagenPreview(); as imagen) {
+            <img [src]="imagen" alt="Vista previa de la portada del grupo" />
+          } @else {
+            <div class="placeholder-imagen">
+              <span aria-hidden="true">+</span>
+              <strong>Dale identidad a tu grupo</strong>
+              <p>Elige una imagen para su portada</p>
+            </div>
+          }
+        </div>
+
+        <input
+          #imagenInput
+          id="imagen-grupo"
+          type="file"
+          accept="image/jpeg,image/png,image/webp"
+          [disabled]="leyendoImagen()"
+          (change)="seleccionarImagen($event)"
+          aria-describedby="imagen-ayuda"
+        />
+
+        <small id="imagen-ayuda">JPG, PNG o WebP. Máximo 5 MB.</small>
+
+        @if (leyendoImagen()) {
+          <p role="status">Preparando vista previa…</p>
+        }
+
+        @if (errorImagen()) {
+          <p class="error" role="alert">{{ errorImagen() }}</p>
+        }
+
+        @if (imagenPreview()) {
+          <button
+            type="button"
+            class="quitar-imagen"
+            [disabled]="leyendoImagen()"
+            (click)="quitarImagen(imagenInput)"
+          >
+            Quitar imagen
+          </button>
+        }
+      </div>
+    </div>
+
+    <footer class="acciones">
+      <a routerLink="/grupos" class="cancelar">Cancelar</a>
+
+      <button
+        type="submit"
+        class="guardar"
+        [disabled]="leyendoImagen()"
+      >
+        Crear grupo
+      </button>
+    </footer>
+  </form>
+</section>
