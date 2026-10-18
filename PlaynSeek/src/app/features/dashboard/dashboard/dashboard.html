@@ -1,5 +1,21 @@
 <button class="btn btn-success me-2" (click)="notificacion.exito('Se creó correctamente')">Éxito</button>
 <button class="btn btn-danger me-2" (click)="notificacion.error('Algo salió mal')">Error</button>
 <button class="btn btn-info me-2" (click)="notificacion.info('Dato informativo')">Info</button>
-<button class="btn btn-warning" (click)="notificacion.advertencia('Ten cuidado')">Advertencia</button>
-<button class="btn btn-dark ms-2" (click)="probarEliminar()">Probar confirmación</button>
+<button class="btn btn-warning me-2" (click)="notificacion.advertencia('Ten cuidado')">Advertencia</button>
+<button class="btn btn-dark" (click)="probarEliminar()">Probar confirmación</button>
+
+<div class="row row-cols-2 row-cols-lg-4 g-3 mt-3">
+  @for (juego of juegos; track juego._id) {
+    <div class="col">
+      <app-game-card [juego]="juego"></app-game-card>
+    </div>
+  }
+</div>
+
+<div class="row row-cols-2 row-cols-lg-4 g-3 mt-3">
+  @for (usuario of usuarios; track usuario._id) {
+    <div class="col">
+      <app-user-card [usuario]="usuario"></app-user-card>
+    </div>
+  }
+</div>
