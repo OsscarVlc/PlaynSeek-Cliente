@@ -1,1 +1,127 @@
-<p>confirm-email works!</p>
+<section class="auth-pagina" aria-labelledby="titulo-confirmar">
+  <div class="auth-contenedor">
+    <div class="barra-superior">
+      <a routerLink="/login" class="enlace-volver">
+        <i class="bi bi-arrow-left" aria-hidden="true"></i>
+        Ir a iniciar sesión
+      </a>
+    </div>
+
+    <div class="auth-tarjeta pns-tarjeta">
+      <div
+        class="icono-cabecera"
+        [class.verificado]="verificado()"
+        aria-hidden="true"
+      >
+        <i
+          class="bi"
+          [class.bi-envelope-check]="!verificado()"
+          [class.bi-patch-check-fill]="verificado()"
+        ></i>
+      </div>
+
+      @if (!verificado()) {
+        <header class="auth-cabecera">
+          <span class="insignia-pendiente">VERIFICACIÓN PENDIENTE</span>
+          <h1 id="titulo-confirmar">Confirma tu correo</h1>
+          <p class="subtitulo">
+            Enviamos un enlace de activación a
+            <strong class="correo-destino">{{ correo() }}</strong>
+          </p>
+        </header>
+
+        <div class="pasos-caja">
+          <div class="paso-item">
+            <span class="paso-numero">1</span>
+            <div>
+              <strong>Abre tu bandeja de entrada</strong>
+              <p>Busca el mensaje de bienvenida de Play N Seek.</p>
+            </div>
+          </div>
+
+          <div class="paso-item">
+            <span class="paso-numero">2</span>
+            <div>
+              <strong>Haz clic en el enlace de confirmación</strong>
+              <p>El enlace valida que el correo te pertenece.</p>
+            </div>
+          </div>
+
+          <div class="paso-item">
+            <span class="paso-numero">3</span>
+            <div>
+              <strong>Configura tu perfil y encuentra squad</strong>
+              <p>Elige tus plataformas, horarios y juegos favoritos.</p>
+            </div>
+          </div>
+        </div>
+
+        <button
+          type="button"
+          class="boton-submit"
+          (click)="confirmarCuentaDemo()"
+        >
+          <i class="bi bi-check2-circle me-1" aria-hidden="true"></i>
+          Simular clic en enlace de verificación
+        </button>
+
+        <div class="acciones-secundarias">
+          <button
+            type="button"
+            class="boton-secundario"
+            (click)="reenviarCorreo()"
+          >
+            <i class="bi bi-send" aria-hidden="true"></i>
+            Reenviar correo
+            @if (reenvios() > 0) {
+              <span>({{ reenvios() }})</span>
+            }
+          </button>
+
+          <button
+            type="button"
+            class="boton-texto"
+            (click)="usarOtroCorreo()"
+          >
+            Cambiar dirección de correo
+          </button>
+        </div>
+      } @else {
+        <header class="auth-cabecera">
+          <span class="insignia-exito">CUENTA VERIFICADA</span>
+          <h1 id="titulo-confirmar">¡Todo listo, {{ nombre() }}!</h1>
+          <p class="subtitulo">
+            Tu correo <strong class="correo-destino">{{ correo() }}</strong> ha
+            sido confirmado exitosamente. Ya puedes iniciar sesión o completar
+            tu perfil de jugador.
+          </p>
+        </header>
+
+        <div class="resumen-verificado">
+          <i class="bi bi-shield-fill-check" aria-hidden="true"></i>
+          <div>
+            <strong>Acceso habilitado al portal</strong>
+            <p>
+              Ahora eres elegible para enviar solicitudes de match y unirte a
+              comunidades.
+            </p>
+          </div>
+        </div>
+
+        <button
+          type="button"
+          class="boton-lima"
+          (click)="entrarAlPortal()"
+        >
+          Entrar al portal ahora
+        </button>
+
+        <div class="mt-3 text-center">
+          <a routerLink="/perfil" class="enlace-acento">
+            Configurar mis juegos y horarios en Mi Perfil →
+          </a>
+        </div>
+      }
+    </div>
+  </div>
+</section>

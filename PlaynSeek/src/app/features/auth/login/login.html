@@ -1,1 +1,150 @@
-<p>login works!</p>
+<section class="auth-pagina" aria-labelledby="titulo-login">
+  <div class="auth-contenedor">
+    <div class="barra-superior">
+      <a routerLink="/" class="enlace-volver">
+        <i class="bi bi-arrow-left" aria-hidden="true"></i>
+        Volver al inicio
+      </a>
+    </div>
+
+    <div class="auth-tarjeta pns-tarjeta">
+      <header class="auth-cabecera">
+        <h1 id="titulo-login">Bienvenido de nuevo</h1>
+        <p class="subtitulo">
+          Inicia sesión para armar squad con jugadores compatibles
+        </p>
+      </header>
+
+      <button
+        type="button"
+        class="boton-google"
+        (click)="iniciarConGoogle()"
+      >
+        <i class="bi bi-google" aria-hidden="true"></i>
+        <span>Continuar con Google</span>
+      </button>
+
+      <div class="separador" role="separator">
+        <span>O CONTINÚA CON TU CORREO</span>
+      </div>
+
+      <form [formGroup]="formulario" (ngSubmit)="ingresar()" novalidate>
+        <div class="campo">
+          <label for="correo-login">Correo electrónico</label>
+          <div
+            class="input-icono"
+            [class.invalido]="
+              formulario.controls.correo.touched &&
+              formulario.controls.correo.invalid
+            "
+          >
+            <i class="bi bi-envelope icono-izquierdo" aria-hidden="true"></i>
+            <input
+              id="correo-login"
+              type="email"
+              formControlName="correo"
+              placeholder="tu@ejemplo.com"
+              autocomplete="email"
+            />
+          </div>
+          @if (
+            formulario.controls.correo.touched &&
+            formulario.controls.correo.invalid
+          ) {
+            <p class="mensaje-error" role="alert">
+              Ingresa una dirección de correo electrónico válida.
+            </p>
+          }
+        </div>
+
+        <div class="campo">
+          <label for="password-login">Contraseña</label>
+          <div
+            class="input-icono"
+            [class.invalido]="
+              formulario.controls.password.touched &&
+              formulario.controls.password.invalid
+            "
+          >
+            <i class="bi bi-lock icono-izquierdo" aria-hidden="true"></i>
+            <input
+              id="password-login"
+              [type]="mostrarPassword() ? 'text' : 'password'"
+              formControlName="password"
+              placeholder="Ingresa tu contraseña"
+              autocomplete="current-password"
+            />
+            <button
+              type="button"
+              class="boton-ojo"
+              (click)="alternarPassword()"
+              [attr.aria-label]="
+                mostrarPassword()
+                  ? 'Ocultar contraseña'
+                  : 'Mostrar contraseña'
+              "
+            >
+              <i
+                class="bi"
+                [class.bi-eye]="!mostrarPassword()"
+                [class.bi-eye-slash]="mostrarPassword()"
+                aria-hidden="true"
+              ></i>
+            </button>
+          </div>
+          @if (
+            formulario.controls.password.touched &&
+            formulario.controls.password.invalid
+          ) {
+            <p class="mensaje-error" role="alert">
+              La contraseña debe tener al menos 6 caracteres.
+            </p>
+          }
+        </div>
+
+        <div class="fila-opciones">
+          <label class="checkbox-label">
+            <input type="checkbox" formControlName="recordarme" />
+            <span>Recordarme</span>
+          </label>
+
+          <a routerLink="/olvide-contrasena" class="enlace-acento">
+            ¿Olvidaste tu contraseña?
+          </a>
+        </div>
+
+        <button type="submit" class="boton-submit">
+          Iniciar sesión
+        </button>
+      </form>
+
+      <div class="acceso-rapido" aria-label="Cuentas de demostración">
+        <p class="acceso-titulo">Cargar credenciales de prueba por rol:</p>
+        <div class="chips-demo">
+          @for (cuenta of cuentasDemo; track cuenta.correo) {
+            <button
+              type="button"
+              class="chip-demo"
+              (click)="rellenarCuentaDemo(cuenta)"
+              [title]="cuenta.descripcion"
+            >
+              {{ cuenta.etiqueta }}
+            </button>
+          }
+        </div>
+      </div>
+
+      <footer class="auth-pie">
+        <span>¿No tienes una cuenta?</span>
+        <a routerLink="/registro" class="enlace-acento fw-semibold">
+          Regístrate
+        </a>
+      </footer>
+    </div>
+
+    <p class="insignia-seguridad">
+      <i class="bi bi-shield-check" aria-hidden="true"></i>
+      Protegido por autenticación JWT de Play N Seek
+    </p>
+  </div>
+</section>
