@@ -1,0 +1,99 @@
+:host { display: block; }
+.perfil-pagina { padding-bottom: 2.5rem; }
+.texto-suave { color: var(--pns-color-texto-suave); }
+.texto-lima { color: var(--pns-color-primario); }
+.perfil-cabecera {
+  display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.6rem;
+  .eyebrow { margin: 0 0 0.3rem; color: var(--pns-color-acento); font-size: 0.72rem; font-weight: 700; letter-spacing: 0.08em; }
+  h1 { margin: 0 0 0.3rem; font-size: clamp(1.8rem, 3.5vw, 2.4rem); font-weight: 700; }
+  .subtitulo { margin: 0; color: var(--pns-color-texto-suave); font-size: 0.9rem; }
+}
+.cabecera-acciones, .acciones-finales, .acciones-juego-fila { display: flex; align-items: center; gap: 0.6rem; }
+.boton-secundario {
+  display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.48rem 0.95rem;
+  border-radius: 9px; border: 1px solid var(--pns-color-borde); background: var(--pns-color-tarjeta);
+  color: var(--pns-color-texto); font-size: 0.84rem; font-weight: 600; cursor: pointer;
+}
+.perfil-layout { display: grid; grid-template-columns: 320px minmax(0, 1fr); gap: 1.4rem; align-items: start; }
+.columna-resumen { position: sticky; top: 1rem; }
+.tarjeta-jugador { overflow: hidden; }
+.portada-jugador { height: 90px; padding: 0.7rem 1rem; background: linear-gradient(135deg, #35295b, #1a2634); display: flex; justify-content: flex-end; align-items: flex-start; }
+.insignia-verificado { display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.2rem 0.55rem; border-radius: 999px; background: rgba(16,17,22,0.75); color: var(--pns-color-primario); font-size: 0.7rem; font-weight: 600; }
+.cuerpo-jugador { padding: 0 1.25rem 1.3rem; text-align: center; }
+.avatar-contenedor {
+  width: 82px; height: 82px; margin: -41px auto 0.7rem; border-radius: 50%;
+  border: 4px solid var(--pns-color-tarjeta); background: var(--pns-color-acento-fondo);
+  overflow: hidden; display: flex; align-items: center; justify-content: center;
+}
+.avatar-imagen { width: 100%; height: 100%; object-fit: cover; }
+.avatar-iniciales { font-family: var(--pns-fuente-titulo); font-size: 1.65rem; font-weight: 700; color: var(--pns-color-acento); }
+.nombre-jugador { margin: 0 0 0.15rem; font-size: 1.2rem; font-weight: 700; }
+.correo-jugador { margin: 0 0 0.8rem; font-size: 0.8rem; color: var(--pns-color-texto-suave); }
+.foto-controles { display: flex; justify-content: center; align-items: center; gap: 0.5rem; margin-bottom: 1.1rem; }
+.boton-subir-foto { padding: 0.32rem 0.75rem; border-radius: 8px; border: 1px solid var(--pns-color-borde); background: #13141c; color: var(--pns-color-texto); font-size: 0.76rem; font-weight: 600; cursor: pointer; }
+.boton-quitar-foto { border: 0; background: transparent; color: #ff8787; font-size: 0.76rem; cursor: pointer; }
+.progreso-caja { text-align: left; padding: 0.8rem; border-radius: 10px; background: #13141c; border: 1px solid var(--pns-color-borde); margin-bottom: 1rem; }
+.barra-progreso { height: 6px; border-radius: 999px; background: #252736; overflow: hidden; }
+.barra-relleno { height: 100%; background: linear-gradient(90deg, #635bff, var(--pns-color-primario)); }
+.resumen-bloque {
+  text-align: left; padding-top: 0.9rem; margin-top: 0.9rem; border-top: 1px solid var(--pns-color-borde);
+  h3 { font-size: 0.74rem; font-weight: 700; text-transform: uppercase; color: var(--pns-color-texto-suave); margin: 0 0 0.45rem; }
+}
+.chips-rol, .pildoras-grupo, .pildoras-pasados { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.chip-rol, .pildora-opcion {
+  padding: 0.32rem 0.75rem; border-radius: 999px; border: 1px solid var(--pns-color-borde);
+  background: #13141c; color: var(--pns-color-texto-suave); font-size: 0.78rem; font-weight: 600; text-transform: capitalize; cursor: pointer;
+  &.activo, &.seleccionada { border-color: #7c6cff; background: var(--pns-color-acento-fondo); color: var(--pns-color-texto); }
+}
+.columna-formulario form { display: flex; flex-direction: column; gap: 1.2rem; }
+.panel-form { padding: 1.4rem; }
+.panel-titulo {
+  display: flex; align-items: flex-start; gap: 0.8rem; margin-bottom: 1.15rem;
+  > i, .d-flex > i { width: 36px; height: 36px; border-radius: 9px; display: flex; align-items: center; justify-content: center; background: var(--pns-color-acento-fondo); color: var(--pns-color-acento); }
+  h2 { margin: 0 0 0.15rem; font-size: 1.1rem; font-weight: 700; }
+  p { margin: 0; font-size: 0.8rem; color: var(--pns-color-texto-suave); }
+}
+.grid-campos { display: grid; grid-template-columns: 1fr 1fr; gap: 0.95rem; }
+.campo-completo { grid-column: 1 / -1; }
+.campo {
+  display: flex; flex-direction: column; gap: 0.35rem;
+  label, .etiqueta-bloque { font-size: 0.8rem; font-weight: 600; }
+  input, select { padding: 0.62rem 0.8rem; border-radius: 9px; border: 1px solid var(--pns-color-borde); background: #13141c; color: var(--pns-color-texto); font-size: 0.88rem; }
+}
+.error-texto { color: #ff8787; font-size: 0.74rem; }
+.subbloque { margin-bottom: 1.1rem; }
+.etiqueta-bloque { display: block; font-size: 0.8rem; font-weight: 600; margin-bottom: 0.5rem; }
+.horarios-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(195px, 1fr)); gap: 0.6rem; }
+.tarjeta-horario {
+  display: flex; align-items: center; gap: 0.55rem; padding: 0.65rem 0.85rem; border-radius: 10px;
+  border: 1px solid var(--pns-color-borde); background: #13141c; color: var(--pns-color-texto-suave); font-size: 0.8rem; font-weight: 600; cursor: pointer;
+  i { color: var(--pns-color-acento); }
+  &.seleccionada { border-color: var(--pns-color-primario); background: rgba(188,255,98,0.08); color: var(--pns-color-texto); }
+}
+.lista-plataformas, .lista-juegos-perfil { display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 0.95rem; }
+.fila-item, .juego-perfil-fila {
+  display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.7rem;
+  padding: 0.6rem 0.8rem; border-radius: 9px; background: #13141c; border: 1px solid var(--pns-color-borde);
+}
+.gamertag-texto, .juego-nombre-link { flex: 1; font-weight: 700; color: var(--pns-color-texto); text-decoration: none; }
+.privacidad-tag { font-size: 0.72rem; color: var(--pns-color-texto-suave); }
+.boton-icono-peligro, .boton-peligro {
+  border: 1px solid rgba(255,107,107,0.35); background: rgba(255,107,107,0.08); color: #ff8787;
+  border-radius: 8px; padding: 0.35rem 0.7rem; font-size: 0.8rem; font-weight: 600; cursor: pointer;
+}
+.agregar-fila {
+  display: flex; flex-wrap: wrap; gap: 0.55rem;
+  select, input { padding: 0.55rem 0.75rem; border-radius: 8px; border: 1px solid var(--pns-color-borde); background: #13141c; color: var(--pns-color-texto); font-size: 0.84rem; }
+  input { flex: 1; min-width: 170px; }
+}
+.boton-agregar, .boton-mini { padding: 0.45rem 0.85rem; border-radius: 8px; border: 1px solid var(--pns-color-borde); background: var(--pns-color-acento-fondo); color: var(--pns-color-texto); font-size: 0.8rem; font-weight: 600; cursor: pointer; }
+.enlace-catalogo { color: var(--pns-color-acento); font-size: 0.8rem; font-weight: 600; text-decoration: none; }
+.subtitulo-lista { font-size: 0.84rem; font-weight: 700; color: var(--pns-color-texto-suave); margin: 0 0 0.6rem; }
+.switch-squad-inline { display: inline-flex; align-items: center; gap: 0.35rem; font-size: 0.78rem; color: var(--pns-color-texto-suave); cursor: pointer; input { accent-color: var(--pns-color-primario); } }
+.chip-pasado {
+  display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.3rem 0.65rem; border-radius: 8px; background: #13141c; border: 1px solid var(--pns-color-borde); font-size: 0.78rem;
+  button { border: 0; background: transparent; color: var(--pns-color-acento); font-size: 0.74rem; font-weight: 600; cursor: pointer; }
+  .chip-borrar { color: #ff8787; }
+}
+.zona-final { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; p { font-size: 0.8rem; color: var(--pns-color-texto-suave); } }
+@media (max-width: 992px) { .perfil-layout, .grid-campos { grid-template-columns: 1fr; } .columna-resumen { position: static; } }

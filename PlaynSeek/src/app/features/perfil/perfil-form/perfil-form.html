@@ -1,1 +1,529 @@
-<p>perfil-form works!</p>
+<section class="perfil-pagina" aria-labelledby="titulo-perfil">
+  <header class="perfil-cabecera">
+    <div>
+      <p class="eyebrow">CONFIGURACIÓN DE CUENTA Y MATCHMAKING</p>
+      <h1 id="titulo-perfil">Mi perfil de jugador</h1>
+      <p class="subtitulo">
+        Mantén al día tus plataformas, horarios y rotación de juegos para
+        mejorar tu compatibilidad con otros jugadores.
+      </p>
+    </div>
+
+    <div class="cabecera-acciones">
+      <button
+        type="button"
+        class="boton-secundario"
+        (click)="restablecerFormulario()"
+      >
+        <i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i>
+        Restablecer
+      </button>
+
+      <button
+        type="button"
+        class="btn btn-pns"
+        (click)="guardarPerfil()"
+      >
+        <i class="bi bi-check2-circle me-1" aria-hidden="true"></i>
+        Guardar cambios
+      </button>
+    </div>
+  </header>
+
+  <div class="perfil-layout">
+    <aside class="columna-resumen">
+      <div class="tarjeta-jugador pns-tarjeta">
+        <div class="portada-jugador">
+          <span class="insignia-verificado">
+            <i class="bi bi-patch-check-fill" aria-hidden="true"></i>
+            Correo confirmado
+          </span>
+        </div>
+
+        <div class="cuerpo-jugador">
+          <div class="avatar-contenedor">
+            @if (fotoPreview(); as foto) {
+              <img
+                [src]="foto"
+                alt="Foto de perfil del jugador"
+                class="avatar-imagen"
+              />
+            } @else {
+              <div class="avatar-iniciales" aria-hidden="true">
+                {{ iniciales() }}
+              </div>
+            }
+          </div>
+
+          <h2 class="nombre-jugador">
+            {{ formulario.controls.nombre.value || 'Jugador' }}
+          </h2>
+          <p class="correo-jugador">{{ formulario.controls.correo.value }}</p>
+
+          <div class="foto-controles">
+            <label for="input-foto-perfil" class="boton-subir-foto">
+              <i class="bi bi-camera" aria-hidden="true"></i>
+              Cambiar foto
+            </label>
+            <input
+              #fotoInput
+              id="input-foto-perfil"
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              class="d-none"
+              (change)="seleccionarFoto($event)"
+            />
+
+            @if (fotoPreview()) {
+              <button
+                type="button"
+                class="boton-quitar-foto"
+                (click)="quitarFoto(fotoInput)"
+              >
+                Quitar
+              </button>
+            }
+          </div>
+          <div class="progreso-caja">
+            <div class="d-flex justify-content-between small mb-1">
+              <span>Perfil completado</span>
+              <strong class="texto-lima">{{ porcentajeCompletado() }}%</strong>
+            </div>
+            <div class="barra-progreso">
+              <div
+                class="barra-relleno"
+                [style.width.%]="porcentajeCompletado()"
+              ></div>
+            </div>
+          </div>
+          <div class="resumen-bloque">
+            <h3>Plataformas vinculadas</h3>
+            <div class="d-flex flex-wrap gap-1">
+              @for (plat of plataformas(); track plat.nombre) {
+                <span class="badge" [appPlatformBadge]="plat.nombre">
+                  {{ juegosDemo.etiquetaPlataforma(plat.nombre) }} ·
+                  {{ plat.gamertag }}
+                </span>
+              } @empty {
+                <span class="texto-suave small">Sin plataformas aún</span>
+              }
+            </div>
+          </div>
+          <div class="resumen-bloque">
+            <h3>Rol activo en la demostración</h3>
+            <p class="texto-suave small mb-2">
+              Cambia de rol para probar las vistas de Moderación y Admin:
+            </p>
+            <div class="chips-rol">
+              @for (rol of rolesDisponibles; track rol) {
+                <button
+                  type="button"
+                  class="chip-rol"
+                  [class.activo]="auth.usuarioActual?.rol === rol"
+                  (click)="cambiarRolDemo(rol)"
+                >
+                  {{ rol }}
+                </button>
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+    </aside>
+    <div class="columna-formulario">
+      <form [formGroup]="formulario" (ngSubmit)="guardarPerfil()" novalidate>
+        <section class="panel-form pns-tarjeta" aria-labelledby="sec-personal">
+          <div class="panel-titulo">
+            <i class="bi bi-person-badge" aria-hidden="true"></i>
+            <div>
+              <h2 id="sec-personal">Datos personales</h2>
+              <p>Información básica de tu cuenta y ubicación horaria.</p>
+            </div>
+          </div>
+
+          <div class="grid-campos">
+            <div class="campo">
+              <label for="perfil-nombre">Nombre visible / Nickname *</label>
+              <input
+                id="perfil-nombre"
+                type="text"
+                formControlName="nombre"
+                placeholder="Ej. Oscar Velasco"
+              />
+              @if (
+                formulario.controls.nombre.touched &&
+                formulario.controls.nombre.invalid
+              ) {
+                <small class="error-texto" role="alert">
+                  El nombre debe tener al menos 3 caracteres.
+                </small>
+              }
+            </div>
+
+            <div class="campo">
+              <label for="perfil-correo">Correo electrónico *</label>
+              <input
+                id="perfil-correo"
+                type="email"
+                formControlName="correo"
+                placeholder="tu@correo.com"
+              />
+              @if (
+                formulario.controls.correo.touched &&
+                formulario.controls.correo.invalid
+              ) {
+                <small class="error-texto" role="alert">
+                  Ingresa un correo electrónico válido.
+                </small>
+              }
+            </div>
+
+            <div class="campo">
+              <label for="perfil-edad">Edad *</label>
+              <input
+                id="perfil-edad"
+                type="number"
+                formControlName="edad"
+                min="13"
+                max="99"
+              />
+            </div>
+
+            <div class="campo">
+              <label for="perfil-sexo">Género</label>
+              <select id="perfil-sexo" formControlName="sexo">
+                @for (item of sexos; track item) {
+                  <option [value]="item">{{ item }}</option>
+                }
+              </select>
+            </div>
+
+            <div class="campo campo-completo">
+              <label for="perfil-zona">Zona horaria</label>
+              <select id="perfil-zona" formControlName="zona_horaria">
+                @for (zona of zonasHorarias; track zona) {
+                  <option [value]="zona">{{ zona }}</option>
+                }
+              </select>
+            </div>
+          </div>
+        </section>
+        <section class="panel-form pns-tarjeta" aria-labelledby="sec-horarios">
+          <div class="panel-titulo">
+            <i class="bi bi-calendar-week" aria-hidden="true"></i>
+            <div>
+              <h2 id="sec-horarios">Disponibilidad y horarios</h2>
+              <p>
+                Selecciona qué días y en qué momentos del día sueles conectarte.
+              </p>
+            </div>
+          </div>
+
+          <div class="subbloque">
+            <span class="etiqueta-bloque">Días disponibles</span>
+            <div class="pildoras-grupo" role="group" aria-label="Días de juego">
+              @for (dia of diasSemana; track dia) {
+                <button
+                  type="button"
+                  class="pildora-opcion"
+                  [class.seleccionada]="disponibilidad().includes(dia)"
+                  (click)="alternarDia(dia)"
+                >
+                  {{ dia }}
+                </button>
+              }
+            </div>
+          </div>
+
+          <div class="subbloque mb-0">
+            <span class="etiqueta-bloque">Horario habitual de juego</span>
+            <div class="horarios-grid">
+              @for (bloque of bloquesHorario; track bloque.valor) {
+                <button
+                  type="button"
+                  class="tarjeta-horario"
+                  [class.seleccionada]="horarioJuego().includes(bloque.valor)"
+                  (click)="alternarHorario(bloque.valor)"
+                >
+                  <i [class]="'bi ' + bloque.icono" aria-hidden="true"></i>
+                  <span>{{ bloque.etiqueta }}</span>
+                </button>
+              }
+            </div>
+          </div>
+        </section>
+        <section class="panel-form pns-tarjeta" aria-labelledby="sec-estilo">
+          <div class="panel-titulo">
+            <i class="bi bi-lightning-charge" aria-hidden="true"></i>
+            <div>
+              <h2 id="sec-estilo">Estilo de juego e idiomas</h2>
+              <p>
+                Ayuda al algoritmo de match a encontrar compañeros con tu misma
+                mentalidad.
+              </p>
+            </div>
+          </div>
+
+          <div class="subbloque">
+            <span class="etiqueta-bloque">Modo de juego preferido</span>
+            <div class="pildoras-grupo">
+              @for (modo of modosDisponibles; track modo) {
+                <button
+                  type="button"
+                  class="pildora-opcion"
+                  [class.seleccionada]="modosJuego().includes(modo)"
+                  (click)="alternarModo(modo)"
+                >
+                  {{ modo }}
+                </button>
+              }
+            </div>
+          </div>
+
+          <div class="subbloque mb-0">
+            <span class="etiqueta-bloque">Idiomas que hablas</span>
+            <div class="pildoras-grupo">
+              @for (idioma of idiomasDisponibles; track idioma) {
+                <button
+                  type="button"
+                  class="pildora-opcion"
+                  [class.seleccionada]="idiomas().includes(idioma)"
+                  (click)="alternarIdioma(idioma)"
+                >
+                  {{ idioma }}
+                </button>
+              }
+            </div>
+          </div>
+        </section>
+        <section
+          class="panel-form pns-tarjeta"
+          aria-labelledby="sec-plataformas"
+        >
+          <div class="panel-titulo">
+            <i class="bi bi-controller" aria-hidden="true"></i>
+            <div>
+              <h2 id="sec-plataformas">Plataformas y Gamertags</h2>
+              <p>
+                Tus gamertags solo se muestran a los jugadores con los que
+                hagas match.
+              </p>
+            </div>
+          </div>
+
+          <div class="lista-plataformas">
+            @for (plat of plataformas(); track plat.nombre) {
+              <div class="fila-item">
+                <span class="badge" [appPlatformBadge]="plat.nombre">
+                  <i
+                    [class]="'bi ' + juegosDemo.iconoPlataforma(plat.nombre) + ' me-1'"
+                    aria-hidden="true"
+                  ></i>
+                  {{ juegosDemo.etiquetaPlataforma(plat.nombre) }}
+                </span>
+
+                <strong class="gamertag-texto">{{ plat.gamertag }}</strong>
+
+                <span class="privacidad-tag">
+                  <i class="bi bi-lock-fill" aria-hidden="true"></i>
+                  Solo matches
+                </span>
+
+                <button
+                  type="button"
+                  class="boton-icono-peligro"
+                  (click)="eliminarPlataforma(plat)"
+                  [attr.aria-label]="'Eliminar plataforma ' + plat.nombre"
+                >
+                  <i class="bi bi-trash3" aria-hidden="true"></i>
+                </button>
+              </div>
+            } @empty {
+              <p class="texto-suave small mb-2">
+                No has agregado ninguna plataforma todavía.
+              </p>
+            }
+          </div>
+
+          <div class="agregar-fila">
+            <select
+              #platSelect
+              [value]="nuevaPlataforma()"
+              (change)="nuevaPlataforma.set($any(platSelect.value))"
+              aria-label="Seleccionar plataforma"
+            >
+              @for (plat of plataformasCatalogo; track plat) {
+                <option [value]="plat">
+                  {{ juegosDemo.etiquetaPlataforma(plat) }}
+                </option>
+              }
+            </select>
+
+            <input
+              #tagInput
+              type="text"
+              placeholder="Tu Gamertag / Steam ID / PSN..."
+              [value]="nuevoGamertag()"
+              (input)="nuevoGamertag.set(tagInput.value)"
+            />
+
+            <button
+              type="button"
+              class="boton-agregar"
+              (click)="agregarPlataforma()"
+            >
+              + Vincular plataforma
+            </button>
+          </div>
+        </section>
+        <section class="panel-form pns-tarjeta" aria-labelledby="sec-juegos">
+          <div class="panel-titulo justify-content-between">
+            <div class="d-flex align-items-start gap-3">
+              <i class="bi bi-collection-play" aria-hidden="true"></i>
+              <div>
+                <h2 id="sec-juegos">Mi rotación de juegos</h2>
+                <p>
+                  Administra qué títulos estás jugando ahora y en cuáles buscas
+                  squad.
+                </p>
+              </div>
+            </div>
+
+            <a routerLink="/juegos" class="enlace-catalogo">
+              Explorar catálogo →
+            </a>
+          </div>
+
+          <h3 class="subtitulo-lista">
+            Juegos activos ({{ juegosDemo.juegosActivos().length }})
+          </h3>
+
+          <div class="lista-juegos-perfil">
+            @for (activo of juegosDemo.juegosActivos(); track activo.juego_id) {
+              <div class="juego-perfil-fila">
+                <a
+                  [routerLink]="['/juegos', activo.juego_id]"
+                  class="juego-nombre-link"
+                >
+                  {{ tituloJuego(activo.juego_id) }}
+                </a>
+
+                <label class="switch-squad-inline">
+                  <input
+                    type="checkbox"
+                    [checked]="activo.busca_equipo"
+                    (change)="alternarBuscaEquipoEnPerfil(activo.juego_id)"
+                  />
+                  <span>Buscando squad</span>
+                </label>
+
+                <div class="acciones-juego-fila">
+                  <button
+                    type="button"
+                    class="boton-mini"
+                    (click)="moverJuegoAHistorial(activo.juego_id)"
+                    title="Mover a jugados antes"
+                  >
+                    <i class="bi bi-clock-history" aria-hidden="true"></i>
+                    Jugado antes
+                  </button>
+
+                  <button
+                    type="button"
+                    class="boton-icono-peligro"
+                    (click)="quitarJuegoActivo(activo.juego_id)"
+                    title="Quitar de juegos activos"
+                  >
+                    <i class="bi bi-trash3" aria-hidden="true"></i>
+                  </button>
+                </div>
+              </div>
+            } @empty {
+              <p class="texto-suave small">
+                No tienes juegos activos en este momento.
+              </p>
+            }
+          </div>
+
+          @if (juegosNoActivos().length > 0) {
+            <div class="agregar-fila mt-3">
+              <select
+                #juegoSelect
+                [value]="juegoParaAgregar()"
+                (change)="juegoParaAgregar.set(juegoSelect.value)"
+                aria-label="Seleccionar juego para agregar"
+              >
+                @for (j of juegosNoActivos(); track j._id) {
+                  <option [value]="j._id">{{ j.titulo }}</option>
+                }
+              </select>
+
+              <button
+                type="button"
+                class="boton-agregar"
+                (click)="agregarJuegoARotacion()"
+              >
+                + Agregar a juegos activos
+              </button>
+            </div>
+          }
+
+          <h3 class="subtitulo-lista mt-4">
+            Juegos jugados anteriormente ({{ juegosDemo.juegosPasados().length }})
+          </h3>
+
+          <div class="pildoras-pasados">
+            @for (pasadoId of juegosDemo.juegosPasados(); track pasadoId) {
+              <div class="chip-pasado">
+                <span>{{ tituloJuego(pasadoId) }}</span>
+                <button
+                  type="button"
+                  class="chip-accion"
+                  (click)="reactivarJuegoPasado(pasadoId)"
+                  title="Volver a mover a juegos activos"
+                >
+                  Reactivar
+                </button>
+                <button
+                  type="button"
+                  class="chip-borrar"
+                  (click)="quitarJuegoPasado(pasadoId)"
+                  title="Quitar del historial"
+                >
+                  ×
+                </button>
+              </div>
+            } @empty {
+              <span class="texto-suave small">
+                Sin juegos registrados en tu historial pasado.
+              </span>
+            }
+          </div>
+        </section>
+        <footer class="panel-form zona-final pns-tarjeta">
+          <div class="peligro-info">
+            <strong>Privacidad y estado de la cuenta</strong>
+            <p class="mb-0">
+              Puedes desactivar temporalmente tu perfil si no deseas aparecer
+              en las recomendaciones de match.
+            </p>
+          </div>
+
+          <div class="acciones-finales">
+            <button
+              type="button"
+              class="boton-peligro"
+              (click)="desactivarCuenta()"
+            >
+              Desactivar cuenta
+            </button>
+
+            <button type="submit" class="btn btn-pns">
+              Guardar todos los cambios
+            </button>
+          </div>
+        </footer>
+      </form>
+    </div>
+  </div>
+</section>
