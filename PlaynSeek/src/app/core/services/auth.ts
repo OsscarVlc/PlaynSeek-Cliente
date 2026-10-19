@@ -9,7 +9,7 @@ import { Injectable } from '@angular/core';
 
 import { Usuario, Rol } from '@shared/models/usuario';
 
-// Usuario de prueba con el que arranca la app.
+// Usuario de prueba con el que arranca la app
 const USUARIO_PRUEBA: Usuario = {
   _id: 'u1',
   nombre: 'Oscar Velasco',
@@ -27,20 +27,21 @@ const USUARIO_PRUEBA: Usuario = {
 
 
 export class Auth {
-  // Aquí vive la sesión. Si es null, nadie ha iniciado sesión.
+  // Aquí vive la sesion 
+  // Si es null, nadie ha iniciado sesio
   // POR AHORA EMPIEZA con el usuario de prueba para poder ver el portal
   usuarioActual: Usuario | null = USUARIO_PRUEBA;
 
-  // ¿Hay alguien con sesión?
-  //  devuelve true cuando sI hay un usuario.
+  // ¿Hay alguien con sesion?
+  //  devuelve true cuando sI hay un usuario
   estaAutenticado(): boolean {
     return this.usuarioActual !== null;
   }
 
   // ¿El usuario actual tiene alguno de estos roles?
-  // Recibe una lista porque algunas secciones aceptan más de uno
+  // Recibe una lista porque algunas secciones aceptan mas de uno
   tieneRol(roles: Rol[]): boolean {
-    // Sin sesión no hay rol
+    // Sin sesion no hay rol
     if (this.usuarioActual === null) {
       return false;
     }
@@ -48,7 +49,7 @@ export class Auth {
     return roles.includes(this.usuarioActual.rol);
   }
 
-  // Simula iniciar sesión
+  // Simula iniciar sesion
   iniciarSesion(): void {
     this.usuarioActual = USUARIO_PRUEBA;
   }
@@ -59,8 +60,8 @@ export class Auth {
   }
 
   //Esto solo es para probar mientras se desarolla
-  // cambia el rol del usuario actual sin tener que editar el código.
-  // para poder ver como cambia el sidebar y como reaccionan los guards
+  // cambia el rol del usuario actual sin tener que editar el codigo
+  // para poder ver como cambia el navbar y como reaccionan los guards
   cambiarRol(rol: Rol): void {
     if (this.usuarioActual !== null) {
       this.usuarioActual.rol = rol;

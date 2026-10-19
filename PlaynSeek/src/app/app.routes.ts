@@ -47,7 +47,7 @@ export const routes: Routes = [
 
 
   // PORTAL: lo que ve el usuario con sesión iniciada
-  // PortalLayout trae la navbar y el sidebar
+  // PortalLayout trae la navbar
   {
     path: '',
     component: PortalLayout,
