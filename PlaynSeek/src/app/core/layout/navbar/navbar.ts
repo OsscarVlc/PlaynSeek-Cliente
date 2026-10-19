@@ -1,28 +1,45 @@
 // ============================================================
 // core/layout/navbar/navbar.ts
-// Muestra el nombre del usuario con sesión y permite ir al perfil o cerrar sesión.
+// Barra de navegación unica de toda la app
 // ============================================================
 
 import { Component, inject } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
+import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 
 import { Auth } from '@core/services/auth';
+import { Notification } from '@core/services/notification';
 
 @Component({
   selector: 'app-navbar',
-  imports: [RouterLink],
+  imports: [RouterLink, RouterLinkActive],
   templateUrl: './navbar.html',
   styleUrl: './navbar.scss',
 })
 export class Navbar {
-  // Pedimos el servicio  y lo dejamos públicopara poder leerlo directo desde el HTML
+  // Publicos para poder usarlos directo desde el HTML
   auth = inject(Auth);
+  notificacion = inject(Notification);
   private router = inject(Router);
 
-  // Se ejecuta al presionar Cerrar sesión y borra la sesión
-  // simulada y manda al usuario a la pantalla de login
+  // Primera letra del nombre, para el circulo del usuario
+  // Si no hay usuario, devuelve texto vacio
+  inicial(): string {
+    const usuario = this.auth.usuarioActual;
+    if (usuario === null) {
+      return '';
+    }
+    return usuario.nombre.charAt(0);
+  }
+
+  // Simula una notificacion nueva 
+  verNotificaciones(): void {
+    this.notificacion.info('Tienes una solicitud de match nueva');
+  }
+
+  // Cierra la sesion  y manda a la pantalla de login
   salir(): void {
-    this.auth.cerrarSesion();
-    this.router.navigate(['/login']);
+    this.router.navigate(['/']).then(() => {
+      this.auth.cerrarSesion();
+    });
   }
 }
