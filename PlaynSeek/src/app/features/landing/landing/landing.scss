@@ -1,0 +1,640 @@
+// Contenedor centrado que usan todas las secciones de la landing
+.contenedor {
+  max-width: 1160px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+.texto-suave {
+  color: var(--pns-color-texto-suave);
+}
+
+// Puntito lima que acompaña a las etiquetas
+.punto {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background-color: var(--pns-color-primario);
+  margin-right: 0.5rem;
+}
+
+// ===================== HERO =====================
+// position: relative para que el resplandorse coloque respecto a esta sección, y overflow: hidden
+// para que no se salga de ella.
+.hero {
+  position: relative;
+  overflow: hidden;
+  text-align: center;
+  padding: 6rem 0 5rem;
+}
+
+// ::before crea un elemento decorativo antes del contenido, sin
+// escribir HTML
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(650px circle at 50% 0%, rgba(111, 91, 255, 0.28), transparent 70%),
+    radial-gradient(420px circle at 85% 85%, rgba(188, 255, 98, 0.1), transparent 70%);
+  pointer-events: none;
+}
+
+// El contenido va por encima del resplandor
+.hero-contenido {
+  position: relative;
+}
+
+.etiqueta {
+  color: var(--pns-color-primario);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  margin-bottom: 1.5rem;
+}
+
+
+h1 {
+  max-width: 800px;
+  margin: 0 auto;
+  font-size: clamp(2.6rem, 6vw, 4.5rem);
+  font-weight: 700;
+  line-height: 1.05;
+}
+
+.resalte {
+  color: var(--pns-color-primario);
+}
+
+.descripcion {
+  max-width: 560px;
+  margin: 1.5rem auto 2rem;
+  color: var(--pns-color-texto-suave);
+  font-size: 1.05rem;
+}
+
+// justify-content: center centra los botones en su fila
+.botones {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+.boton-secundario {
+  display: inline-flex;
+  align-items: center;
+  background-color: var(--pns-color-tarjeta);
+  border: 1px solid var(--pns-color-borde);
+  border-radius: 8px;
+  color: var(--pns-color-texto);
+  padding: 0.5rem 1rem;
+  text-decoration: none;
+
+  &:hover {
+    border-color: var(--pns-color-acento-fuerte);
+    color: var(--pns-color-texto);
+  }
+}
+
+.prueba-social {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-top: 2.5rem;
+  font-size: 0.85rem;
+  color: var(--pns-color-texto-suave);
+}
+
+.avatares {
+  display: flex;
+}
+
+// margin-left negativo encima un avatar sobre el anterior
+.avatar-mini {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  margin-left: -8px;
+  border-radius: 50%;
+  border: 2px solid var(--pns-color-fondo);
+  background-color: var(--pns-color-acento-fondo);
+  color: var(--pns-color-acento);
+  font-size: 0.6rem;
+  font-weight: 700;
+
+  &:first-child {
+    margin-left: 0;
+  }
+}
+
+// ================= ESTADÍSTICAS =================
+.estadisticas {
+  border-top: 1px solid var(--pns-color-borde);
+  border-bottom: 1px solid var(--pns-color-borde);
+}
+
+// 5 columnas: texto, 3 números y la insignia al final
+.estadisticas-contenido {
+  display: grid;
+  grid-template-columns: 1.4fr repeat(3, 1fr) auto;
+  gap: 1.5rem;
+  align-items: center;
+  padding-top: 1.5rem;
+  padding-bottom: 1.5rem;
+}
+
+.numero {
+  font-family: var(--pns-fuente-titulo);
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.insignia-en-linea {
+  background-color: var(--pns-color-acento-fondo);
+  color: var(--pns-color-primario);
+  border-radius: 6px;
+  font-size: 0.65rem;
+  font-weight: 600;
+  padding: 0.35rem 0.7rem;
+}
+
+// En pantallas angostas la franja pasa a dos columnas
+@media (max-width: 900px) {
+  .hero {
+    padding: 4rem 0 3.5rem;
+  }
+
+  .estadisticas-contenido {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+// ================= SECCIONES =================
+// Las demas secciones de la landing reutilizan estas tres clases,
+// para que todas tengan el mismo espacio y los mismos tiitulos.
+.seccion {
+  padding: 5rem 0;
+}
+
+.etiqueta-seccion {
+  color: var(--pns-color-acento);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.75rem;
+}
+
+.titulo-seccion {
+  max-width: 640px;
+  margin-bottom: 2.5rem;
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+// ================= CoMO FUNCIONA =================
+.pasos {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+}
+
+.paso {
+  background-color: var(--pns-color-tarjeta);
+  border: 1px solid var(--pns-color-borde);
+  border-radius: 16px;
+  padding: 1.5rem;
+  transition:
+    border-color 0.2s,
+    transform 0.2s;
+
+  &:hover {
+    border-color: var(--pns-color-acento-fuerte);
+    transform: translateY(-4px);
+  }
+
+  h5 {
+    margin: 1.25rem 0 0.5rem;
+  }
+}
+
+.paso-cabecera {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: var(--pns-color-texto-suave);
+  font-size: 1.3rem;
+}
+
+.paso-numero {
+  color: var(--pns-color-acento);
+  font-family: var(--pns-fuente-titulo);
+  font-size: 2.2rem;
+  font-weight: 600;
+}
+
+@media (max-width: 900px) {
+  .seccion {
+    padding: 3.5rem 0;
+  }
+
+  .pasos {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+// ================= BLOQUES DE FUNCIONES =================
+.seccion-alterna {
+  background-color: #14151d;
+  border-top: 1px solid var(--pns-color-borde);
+  border-bottom: 1px solid var(--pns-color-borde);
+}
+
+.funcion {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3rem;
+  align-items: center;
+  margin-bottom: 4rem;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+
+  h3 {
+    font-size: clamp(1.5rem, 3vw, 2.1rem);
+    margin: 0.75rem 0 1rem;
+  }
+}
+
+.invertido .funcion-texto {
+  order: 2;
+}
+
+
+.etiqueta-mini {
+  display: inline-block;
+  background-color: var(--pns-color-acento-fondo);
+  color: var(--pns-color-primario);
+  border-radius: 6px;
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  padding: 0.25rem 0.6rem;
+  margin: 0;
+}
+
+.puntos {
+  list-style: none;
+  padding: 0;
+  margin: 1.5rem 0 0;
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-bottom: 0.6rem;
+    font-size: 0.9rem;
+  }
+
+  i {
+    color: var(--pns-color-primario);
+  }
+}
+
+.funcion-visual {
+  padding: 1.5rem;
+  box-shadow: 0 16px 50px rgba(0, 0, 0, 0.4);
+}
+
+.visual-cabecera {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.25rem;
+}
+
+.porcentaje {
+  background-color: var(--pns-color-primario);
+  color: var(--pns-color-texto-primario);
+  border-radius: 8px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.3rem 0.6rem;
+}
+
+.chip {
+  background-color: var(--pns-color-acento-fondo);
+  color: var(--pns-color-acento);
+  border-radius: 6px;
+  font-size: 0.72rem;
+  font-weight: 500;
+  padding: 0.25rem 0.6rem;
+}
+
+.barra-fila {
+  margin-bottom: 0.9rem;
+}
+
+.barra-fondo {
+  height: 8px;
+  margin-top: 0.3rem;
+  border-radius: 999px;
+  background-color: var(--pns-color-fondo);
+  overflow: hidden;
+}
+
+.barra-relleno {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--pns-color-acento-fuerte), var(--pns-color-primario));
+}
+
+// ---------- 2 conversacion ----------
+.conversacion {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.burbuja {
+  max-width: 80%;
+  background-color: #23242f;
+  border-radius: 14px 14px 14px 4px;
+  font-size: 0.85rem;
+  padding: 0.6rem 0.9rem;
+
+  // Mensajes propios
+  &.propia {
+    align-self: flex-end;
+    background-color: var(--pns-color-acento-fuerte);
+    border-radius: 14px 14px 4px 14px;
+  }
+}
+
+// ----------  tarjeta de grupo ----------
+.pestanas {
+  display: flex;
+  gap: 1rem;
+  border-bottom: 1px solid var(--pns-color-borde);
+  margin-bottom: 1.25rem;
+}
+
+.pestana {
+  color: var(--pns-color-texto-suave);
+  font-size: 0.8rem;
+  padding-bottom: 0.5rem;
+
+  &.activa {
+    color: var(--pns-color-acento);
+    border-bottom: 2px solid var(--pns-color-acento);
+  }
+}
+
+.avatares-grupo {
+  display: flex;
+}
+
+@media (max-width: 900px) {
+  .funcion {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  // En una sola columna el texto siempre va primero
+  .invertido .funcion-texto {
+    order: 0;
+  }
+}
+
+// ================= JUEGOS DESTACADOS =================
+.seccion-cabecera {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.enlace-ver-todos {
+  color: var(--pns-color-primario);
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-decoration: none;
+
+  &:hover {
+    color: var(--pns-color-primario-hover);
+  }
+}
+
+.cuadricula-juegos {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1.25rem;
+}
+
+
+// ================= COMUNIDADES =================
+// Tres columnas iguales, una por comunidad
+.comunidades {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+}
+
+// overflow: hidden recorta la cabecera a las esquinas redondeadas de la tarjeta
+.comunidad {
+  overflow: hidden;
+  transition:
+    border-color 0.2s,
+    transform 0.2s;
+
+  &:hover {
+    border-color: var(--pns-color-acento-fuerte);
+    transform: translateY(-4px);
+  }
+
+  h5 {
+    margin-bottom: 0.25rem;
+  }
+}
+
+// Cabecera con el ícono a la izquierda y el juego a la derecha
+.comunidad-cabecera {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 90px;
+  padding: 0 1.25rem;
+  font-size: 1.8rem;
+}
+
+// Cada tono es un degradado distinto, de izquierda a derecha
+.morado {
+  background: linear-gradient(120deg, #40335f, #202333);
+}
+
+.verde {
+  background: linear-gradient(120deg, #244a42, #202a32);
+}
+
+.rosa {
+  background: linear-gradient(120deg, #51374e, #252433);
+}
+
+.comunidad-juego {
+  background-color: rgba(16, 17, 22, 0.55);
+  border-radius: 6px;
+  color: var(--pns-color-texto-suave);
+  font-family: var(--pns-fuente-texto);
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  padding: 0.25rem 0.6rem;
+}
+
+.comunidad-cuerpo {
+  padding: 1.25rem;
+}
+
+// Linea separadora arriba, avatares a la izquierda y enlace a la derecha
+.comunidad-pie {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid var(--pns-color-borde);
+  margin-top: 1rem;
+  padding-top: 1rem;
+}
+
+@media (max-width: 900px) {
+  .comunidades {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+
+// ===================== FOOTER =====================
+.pie {
+  border-top: 1px solid var(--pns-color-borde);
+  background-color: #0d0e13;
+  padding-top: 3.5rem;
+}
+
+// Cuatro columnas: la de la marca es más ancha que las de enlaces
+.pie-contenido {
+  display: grid;
+  grid-template-columns: 1.6fr repeat(3, 1fr);
+  gap: 2rem;
+  padding-bottom: 2.5rem;
+}
+
+.pie-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  margin-bottom: 0.75rem;
+  font-family: var(--pns-fuente-titulo);
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+.pie-logo-icono {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  background-color: var(--pns-color-primario);
+  color: var(--pns-color-texto-primario);
+}
+
+.pie-marca p {
+  max-width: 280px;
+}
+
+.redes {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.red {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: var(--pns-color-tarjeta);
+  border: 1px solid var(--pns-color-borde);
+  color: var(--pns-color-texto-suave);
+
+  &:hover {
+    border-color: var(--pns-color-acento-fuerte);
+    color: var(--pns-color-texto);
+  }
+}
+
+.pie-titulo {
+  font-family: var(--pns-fuente-texto);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  margin-bottom: 1rem;
+}
+
+
+.pie-lista {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+
+  li {
+    margin-bottom: 0.6rem;
+    font-size: 0.88rem;
+  }
+
+  a,
+  span {
+    color: var(--pns-color-texto-suave);
+    text-decoration: none;
+  }
+
+  a:hover {
+    color: var(--pns-color-texto);
+  }
+}
+
+.pie-inferior {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.5rem;
+  border-top: 1px solid var(--pns-color-borde);
+  color: var(--pns-color-texto-suave);
+  font-size: 0.78rem;
+  padding-top: 1.25rem;
+  padding-bottom: 1.5rem;
+}
+
+@media (max-width: 900px) {
+  .pie-contenido {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .pie-marca {
+    grid-column: 1 / -1;
+  }
+}
