@@ -4,25 +4,55 @@
 // Este archivo es de Oscar
 // ============================================================
 
-//  :root significa toda la página
-// así que cualquier .scss puede usarlas con var(--nombre).
 :root {
-  --pns-color-primario: #6f42c1; 
-  --pns-color-secundario: #20c997; 
-  --pns-color-oscuro: #212529; 
-  --pns-color-fondo: #f4f5f9; 
-  --pns-color-tarjeta: #ffffff; 
+  --pns-color-fondo: #101116; // fondo general de las pantallas
+  --pns-color-tarjeta: #181923; // fondo de tarjetas, paneles y formularios
+  --pns-color-borde: #303140; // bordes de tarjetas y separadores
+  --pns-color-texto: #f4f4f8; // texto principal
+  --pns-color-texto-suave: #a7a8b8; // texto secundario y descripciones
+
+  --pns-color-primario: #bcff62; // lima: botones y acciones principales
+  --pns-color-primario-hover: #ceff91; // lima más claro al pasar el mouse
+  --pns-color-texto-primario: #17200f; // texto sobre el lima
+
+  --pns-color-acento: #a49aff; // morado: detalles y resaltes
+  --pns-color-acento-fuerte: #8e7de0; // morado para bordes activos
+  --pns-color-acento-fondo: #30294e; // fondo morado oscuro (elementos activos)
+
+  --pns-fuente-titulo: 'Space Grotesk', sans-serif; // títulos y logo
+  --pns-fuente-texto: 'Inter', sans-serif; // texto general
 }
 
-// Fondo general de la app. Bootstrap pone blanco por defecto.
+// Fondo, texto y fuente generales de la app
 body {
   background-color: var(--pns-color-fondo);
+  color: var(--pns-color-texto);
+  font-family: var(--pns-fuente-texto);
+}
+
+// Todos los títulos usan la fuente de títulos
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--pns-fuente-titulo);
 }
 
 // Clase reutilizable para tarjetas (juegos, usuarios, grupos)
 .pns-tarjeta {
   background-color: var(--pns-color-tarjeta);
-  border: 0;
+  color: var(--pns-color-texto);
+  border: 1px solid var(--pns-color-borde);
   border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+// Boton de accion principal
+.btn-pns {
+  background-color: var(--pns-color-primario);
+  border-color: var(--pns-color-primario);
+  color: var(--pns-color-texto-primario);
+  font-weight: 700;
+
+  &:hover {
+    background-color: var(--pns-color-primario-hover);
+    border-color: var(--pns-color-primario-hover);
+    color: var(--pns-color-texto-primario);
+  }
 }
