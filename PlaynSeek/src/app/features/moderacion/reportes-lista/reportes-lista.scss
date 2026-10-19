@@ -1,0 +1,136 @@
+.texto-suave {
+  color: var(--pns-color-texto-suave);
+}
+
+// ===================== CABECERA =====================
+.cabecera {
+  margin-bottom: 1.5rem;
+
+  h2 {
+    margin: 0.25rem 0;
+    font-size: clamp(1.8rem, 4vw, 2.4rem);
+    font-weight: 700;
+  }
+}
+
+.etiqueta {
+  color: var(--pns-color-primario);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  margin: 0;
+}
+
+// ===================== RESUMEN =====================
+.resumen {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.dato {
+  padding: 1rem 1.25rem;
+}
+
+.numero {
+  font-family: var(--pns-fuente-titulo);
+  font-size: 1.8rem;
+  font-weight: 700;
+  line-height: 1;
+  margin: 0 0 0.3rem;
+}
+
+// ===================== TABLA =====================
+.tabla-caja {
+  padding: 0.5rem 1rem;
+}
+
+.tabla {
+  --bs-table-bg: transparent;
+  --bs-table-border-color: var(--pns-color-borde);
+  --bs-table-color: var(--pns-color-texto);
+
+  th {
+    color: var(--pns-color-texto-suave);
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+}
+
+.columna-motivo {
+  max-width: 280px;
+}
+
+.etiqueta-motivo {
+  display: inline-block;
+  background-color: var(--pns-color-acento-fondo);
+  color: var(--pns-color-acento);
+  border-radius: 6px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+  padding: 0.2rem 0.55rem;
+}
+
+
+.estado {
+  display: inline-block;
+  border-radius: 6px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 0.25rem 0.6rem;
+  text-transform: capitalize;
+}
+
+
+.pendiente {
+  background-color: #2d2814;
+  color: #ffd166;
+}
+
+.resuelto {
+  background-color: #1d2a18;
+  color: var(--pns-color-primario);
+}
+
+.rechazado {
+  background-color: #23242f;
+  color: var(--pns-color-texto-suave);
+}
+
+.acciones {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+.boton-secundario {
+  background-color: var(--pns-color-tarjeta);
+  border: 1px solid var(--pns-color-borde);
+  border-radius: 8px;
+  color: var(--pns-color-texto);
+  font-size: 0.8rem;
+  padding: 0.3rem 0.8rem;
+
+  &:hover {
+    border-color: var(--pns-color-acento-fuerte);
+  }
+
+  &.peligro {
+    color: #ff7a8a;
+
+    &:hover {
+      border-color: #ff7a8a;
+    }
+  }
+}
+
+@media (max-width: 900px) {
+  .resumen {
+    grid-template-columns: 1fr 1fr;
+  }
+}

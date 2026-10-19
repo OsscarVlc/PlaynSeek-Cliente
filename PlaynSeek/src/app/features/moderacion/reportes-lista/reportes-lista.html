@@ -1,1 +1,86 @@
-<p>reportes-lista works!</p>
+<!-- ===================== CABECERA ===================== -->
+<header class="cabecera">
+  <p class="etiqueta">MODERACIÓN</p>
+  <h2>Reportes</h2>
+  <p class="texto-suave mb-0">Revisa lo que reporta la comunidad y decide qué hacer.</p>
+</header>
+
+<!-- ===================== RESUMEN ===================== -->
+<section class="resumen">
+  <div class="dato pns-tarjeta">
+    <p class="numero">{{ reportes.length }}</p>
+    <p class="texto-suave small mb-0">Reportes en total</p>
+  </div>
+  <div class="dato pns-tarjeta">
+    <p class="numero">{{ contarPorEstado('pendiente') }}</p>
+    <p class="texto-suave small mb-0">Pendientes</p>
+  </div>
+  <div class="dato pns-tarjeta">
+    <p class="numero">{{ contarPorEstado('resuelto') }}</p>
+    <p class="texto-suave small mb-0">Resueltos</p>
+  </div>
+  <div class="dato pns-tarjeta">
+    <p class="numero">{{ contarPorEstado('rechazado') }}</p>
+    <p class="texto-suave small mb-0">Rechazados</p>
+  </div>
+</section>
+
+<!-- ===================== TABLA ===================== -->
+<div class="pns-tarjeta tabla-caja">
+  <div class="table-responsive">
+    <table class="table tabla align-middle mb-0">
+      <thead>
+        <tr>
+          <th>Reportado</th>
+          <th>Reportado por</th>
+          <th>Motivo</th>
+          <th>Dónde</th>
+          <th>Fecha</th>
+          <th>Estado</th>
+          <th class="text-end">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (reporte of reportes; track reporte._id) {
+          <tr>
+            <td>
+              <strong>{{ reporte.reportado?.nombre }}</strong>
+            </td>
+
+            <td>{{ reporte.remitente?.nombre }}</td>
+
+            <td class="columna-motivo">
+              <span class="etiqueta-motivo">{{ etiquetaMotivo(reporte.motivo) }}</span>
+              @if (reporte.descripcion) {
+                <p class="texto-suave small mb-0">{{ reporte.descripcion }}</p>
+              }
+            </td>
+
+            <td class="texto-suave small">{{ contexto(reporte) }}</td>
+            <td class="texto-suave small">{{ formatearFecha(reporte.fecha) }}</td>
+
+            <td>
+              <span [class]="'estado ' + reporte.estado">{{ reporte.estado }}</span>
+            </td>
+
+            <td class="text-end">
+
+              @if (reporte.estado === 'pendiente') {
+                <div class="acciones">
+                  <button type="button" class="btn btn-pns btn-sm" (click)="resolver(reporte)">
+                    Resolver
+                  </button>
+                  <button type="button" class="boton-secundario peligro" (click)="rechazar(reporte)">
+                    Rechazar
+                  </button>
+                </div>
+              } @else {
+                <span class="texto-suave small">Sin acciones</span>
+              }
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>

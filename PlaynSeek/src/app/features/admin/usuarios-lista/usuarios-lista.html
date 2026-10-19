@@ -1,1 +1,102 @@
-<p>usuarios-lista works!</p>
+<!-- ===================== CABECERA ===================== -->
+<header class="cabecera">
+  <p class="etiqueta">ADMINISTRACIÓN</p>
+  <h2>Usuarios</h2>
+  <p class="texto-suave mb-0">Gestiona los roles y el estado de las cuentas.</p>
+</header>
+
+<!-- ===================== RESUMEN ===================== -->
+<section class="resumen">
+  <div class="dato pns-tarjeta">
+    <p class="numero">{{ usuarios.length }}</p>
+    <p class="texto-suave small mb-0">Usuarios en total</p>
+  </div>
+  <div class="dato pns-tarjeta">
+    <p class="numero">{{ contarPorRol('administrador') }}</p>
+    <p class="texto-suave small mb-0">Administradores</p>
+  </div>
+  <div class="dato pns-tarjeta">
+    <p class="numero">{{ contarPorRol('moderador') }}</p>
+    <p class="texto-suave small mb-0">Moderadores</p>
+  </div>
+  <div class="dato pns-tarjeta">
+    <p class="numero">{{ contarInactivos() }}</p>
+    <p class="texto-suave small mb-0">Cuentas inactivas</p>
+  </div>
+</section>
+
+<!-- ===================== TABLA ===================== -->
+<div class="pns-tarjeta tabla-caja">
+  <table class="table tabla align-middle mb-0">
+    <thead>
+      <tr>
+        <th>Usuario</th>
+        <th>Rol</th>
+        <th>Estado</th>
+        <th class="text-end">Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (usuario of usuarios; track usuario._id) {
+        <tr>
+          <td>
+            <div class="usuario">
+              <span class="avatar">{{ usuario.nombre.charAt(0) }}</span>
+              <div>
+                <strong>{{ usuario.nombre }}</strong>
+                <p class="texto-suave small mb-0">{{ usuario.correo }}</p>
+              </div>
+            </div>
+          </td>
+
+
+          <td>
+            <span [class]="'etiqueta-rol ' + claseRol(usuario.rol)">{{ usuario.rol }}</span>
+          </td>
+
+          <td>
+            @if (usuario.isActive) {
+              <span class="estado activo">Activo</span>
+            } @else {
+              <span class="estado inactivo">Inactivo</span>
+            }
+            @if (!usuario.correo_confirmado) {
+              <span class="estado pendiente">Sin confirmar</span>
+            }
+          </td>
+
+          <td class="text-end">
+            <div class="acciones">
+              <div class="dropdown">
+                <button type="button" class="boton-secundario" data-bs-toggle="dropdown">
+                  Cambiar rol <i class="bi bi-chevron-down ms-1"></i>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                  @for (rol of roles; track rol) {
+                    <li>
+                      <button type="button" class="dropdown-item" (click)="cambiarRol(usuario, rol)">
+                        {{ rol }}
+                        @if (usuario.rol === rol) {
+                          <i class="bi bi-check-lg ms-2"></i>
+                        }
+                      </button>
+                    </li>
+                  }
+                </ul>
+              </div>
+
+              <button
+                type="button"
+                class="boton-secundario"
+                [class.peligro]="usuario.isActive"
+                (click)="cambiarEstado(usuario)"
+              >
+                {{ usuario.isActive ? 'Desactivar' : 'Reactivar' }}
+              </button>
+            </div>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>
