@@ -1,0 +1,55 @@
+:host { display: block; }
+.catalogo-pagina { padding-bottom: 2rem; }
+.catalogo-cabecera {
+  display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.4rem;
+  .eyebrow { margin: 0 0 .3rem; color: var(--pns-color-acento); font-size: .72rem; font-weight: 700; letter-spacing: .08em; }
+  h1 { margin: 0 0 .3rem; font-size: clamp(1.9rem, 3.8vw, 2.5rem); font-weight: 700; }
+  .subtitulo { margin: 0; color: var(--pns-color-texto-suave); font-size: .92rem; }
+}
+.cabecera-acciones, .grupo-filtro, .pildoras { display: flex; align-items: center; flex-wrap: wrap; gap: .45rem; }
+.boton-mis-juegos, .boton-perfil-juegos {
+  display: inline-flex; align-items: center; gap: .45rem; padding: .48rem .85rem;
+  border-radius: 10px; border: 1px solid var(--pns-color-borde); background: var(--pns-color-tarjeta);
+  color: var(--pns-color-texto); font-size: .84rem; font-weight: 600; text-decoration: none; cursor: pointer;
+  &.activo, &:hover { border-color: var(--pns-color-acento-fuerte); background: var(--pns-color-acento-fondo); }
+}
+.contador-pastilla { padding: .1rem .45rem; border-radius: 99px; background: rgba(164,154,255,.2); color: var(--pns-color-acento); font-size: .74rem; }
+.buscador-barra {
+  display: flex; align-items: center; gap: .7rem; padding: .6rem 1rem; margin-bottom: 1rem;
+  border-radius: 12px; border: 1px solid var(--pns-color-borde); background: var(--pns-color-tarjeta);
+  .icono-buscar { color: var(--pns-color-acento); }
+  input { flex: 1; min-width: 0; border: 0; background: transparent; color: var(--pns-color-texto); font-size: .9rem; outline: none; }
+}
+.boton-limpiar-busqueda { border: 0; background: #252736; color: var(--pns-color-texto-suave); font-size: .75rem; padding: .2rem .55rem; border-radius: 6px; }
+.insignia-rawg { display: flex; align-items: center; gap: .4rem; color: var(--pns-color-texto-suave); font-size: .74rem; kbd { padding: .1rem .4rem; border-radius: 5px; border: 1px solid var(--pns-color-borde); background: #12131b; } }
+.barra-filtros, .barra-resultados { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: .8rem; margin-bottom: 1.1rem; }
+.etiqueta-filtro { font-size: .68rem; font-weight: 700; letter-spacing: .08em; color: var(--pns-color-texto-suave); }
+.pildora {
+  display: inline-flex; align-items: center; gap: .35rem; padding: .3rem .75rem;
+  border-radius: 99px; border: 1px solid var(--pns-color-borde); background: var(--pns-color-tarjeta);
+  color: var(--pns-color-texto-suave); font-size: .76rem; font-weight: 600; cursor: pointer;
+  &.activa, &:hover { border-color: #635bff; background: var(--pns-color-acento-fondo); color: var(--pns-color-texto); }
+}
+.titulo-resultados { display: flex; align-items: baseline; gap: .55rem; h2 { margin: 0; font-size: 1.2rem; font-weight: 700; } .total-juegos { color: var(--pns-color-texto-suave); font-size: .8rem; } }
+.ordenar-caja { display: flex; align-items: center; gap: .45rem; font-size: .8rem; color: var(--pns-color-texto-suave); select { padding: .3rem .6rem; border-radius: 8px; border: 1px solid var(--pns-color-borde); background: var(--pns-color-tarjeta); color: var(--pns-color-texto); } }
+.catalogo-layout { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(310px, 1fr); gap: 1.2rem; align-items: start; &.sin-preview { grid-template-columns: 1fr; } }
+.tarjetas-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 1rem; }
+.juego-card { overflow: hidden; cursor: pointer; display: flex; flex-direction: column; &.seleccionada { border: 2px solid #7c6cff; } }
+.portada-contenedor { position: relative; aspect-ratio: 4 / 4.1; background: #12131c; overflow: hidden; .portada-img { width: 100%; height: 100%; object-fit: cover; } }
+.portada-respaldo { width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #211d36; color: var(--pns-color-acento); i { font-size: 2.2rem; } }
+.insignia-preview, .insignia-activo, .insignia-rating { position: absolute; display: inline-flex; align-items: center; gap: .25rem; padding: .2rem .5rem; border-radius: 7px; font-size: .7rem; font-weight: 700; background: rgba(16,17,22,.9); border: 1px solid var(--pns-color-borde); }
+.insignia-preview, .insignia-activo { top: .55rem; left: .55rem; }
+.insignia-activo { color: var(--pns-color-primario); border-color: var(--pns-color-primario); }
+.insignia-rating { bottom: .55rem; right: .55rem; i { color: #9b8cff; } }
+.card-cuerpo { padding: .9rem; display: flex; flex-direction: column; flex: 1; }
+.juego-titulo { margin: 0 0 .4rem; font-size: .98rem; font-weight: 700; }
+.iconos-plataformas, .etiquetas-genero { display: flex; flex-wrap: wrap; gap: .3rem; margin-bottom: .5rem; }
+.badge-plat { display: inline-flex; align-items: center; gap: .25rem; padding: .14rem .4rem; border-radius: 5px; font-size: .65rem; font-weight: 600; }
+.chip-genero { padding: .15rem .45rem; border-radius: 6px; background: #212330; color: var(--pns-color-texto-suave); font-size: .7rem; font-weight: 600; }
+.card-pie, .catalogo-pie { margin-top: auto; padding-top: .55rem; border-top: 1px solid var(--pns-color-borde); display: flex; justify-content: space-between; align-items: center; font-size: .74rem; color: var(--pns-color-texto-suave); }
+.squad-indicador { display: inline-flex; align-items: center; gap: .35rem; font-size: .74rem; color: var(--pns-color-texto-suave); }
+.punto-verde { width: 7px; height: 7px; border-radius: 50%; background: var(--pns-color-primario); }
+.enlace-detalle { color: var(--pns-color-acento); font-weight: 600; text-decoration: none; }
+.paginacion-demo { display: flex; gap: .3rem; .pagina-item { padding: .2rem .55rem; border-radius: 6px; border: 1px solid var(--pns-color-borde); background: var(--pns-color-tarjeta); color: var(--pns-color-texto); font-size: .75rem; &.activa { background: var(--pns-color-acento-fondo); } } }
+.estado-vacio { padding: 2.5rem 1rem; text-align: center; }
+@media (max-width: 992px) { .catalogo-layout { grid-template-columns: 1fr; } }
