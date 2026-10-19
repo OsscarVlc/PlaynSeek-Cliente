@@ -26,7 +26,7 @@ export class ChatPrivado {
   readonly busqueda = signal('');
 
   // Cada conversación conserva su propio borrador.
-  borradores: Record<string, string> = {};
+  borradores: Record<string, string | undefined> = {};
 
   readonly usuarioSeleccionadoId = computed(
     () => this.parametros().get('id'),

@@ -68,7 +68,7 @@ export class GrupoDetalle {
   readonly errorImagenPost = signal('');
   readonly leyendoImagenPost = signal(false);
 
-  borradoresComentarios: Record<string, string> = {};
+  borradoresComentarios: Record<string, string | undefined> = {};
 
   readonly esIntegrante = computed(() =>
     this.grupo()?.integrantes.some(
