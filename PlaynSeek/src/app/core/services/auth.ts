@@ -6,7 +6,7 @@
 
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { Observable, tap } from 'rxjs';
+import { Observable, tap, firstValueFrom } from 'rxjs';
 
 import { environment } from '@env/environment';
 import { Rol, Usuario } from '@shared/models/usuario';
@@ -22,9 +22,13 @@ interface RespuestaMe {
   user: { id: string; correo: string; rol: Rol; nombre: string; foto_perfil?: string };
 }
 
+
+// Nombre con el que se guarda el token en el navegador
 const CLAVE_TOKEN = 'pns_token';
 
-// Usuario de prueba con el que arranca la app NO TIENE TOKEN
+
+// Usuario de prueba para la sesion SIMULADA que todavía usan las pantallas
+// de registro y confirmar correo
 const USUARIO_PRUEBA: Usuario = {
   _id: 'u1',
   nombre: 'Oscar Velasco',
@@ -34,8 +38,7 @@ const USUARIO_PRUEBA: Usuario = {
   correo_confirmado: true,
 };
 
-// providedIn: 'root' hace que Angular cree una sola instancia
-// de este servicio y la comparta con toda la app
+
 @Injectable({
   providedIn: 'root',
 })
@@ -46,7 +49,7 @@ export class Auth {
   // Aquí vive la sesion 
   // Si es null, nadie ha iniciado sesio
   // POR AHORA EMPIEZA con el usuario de prueba para poder ver el portal
-  usuarioActual: Usuario | null = USUARIO_PRUEBA;
+  usuarioActual: Usuario | null = null;
 
   // ¿Hay alguien con sesion?
   //  devuelve true cuando sI hay un usuario
@@ -108,6 +111,23 @@ export class Auth {
     );
   }
 
+  // Se ejecuta una vez al arrancar la app
+  // si hay un token guardado, pide quien es el usuario
+  // si el token ya no sirve, lo borra y la app queda sin sesion
+  async recuperarSesion(): Promise<void> {
+    if (this.obtenerToken() === null) {
+      return;
+    }
+
+    try {
+      await firstValueFrom(this.cargarUsuario());
+    } catch {
+      localStorage.removeItem(CLAVE_TOKEN);
+      this.usuarioActual = null;
+    }
+  }
+
+
   //  borra el token y deja de haber usuario
   cerrarSesion(): void {
     localStorage.removeItem(CLAVE_TOKEN);
@@ -119,12 +139,12 @@ export class Auth {
     this.usuarioActual = USUARIO_PRUEBA;
   }
 
-  //Esto solo es para probar mientras se desarolla
-  // cambia el rol del usuario actual sin tener que editar el codigo
-  // para poder ver como cambia el navbar y como reaccionan los guards
+  // TEMPORAL
   cambiarRol(rol: Rol): void {
     if (this.usuarioActual !== null) {
       this.usuarioActual.rol = rol;
     }
   }
+
+
 }

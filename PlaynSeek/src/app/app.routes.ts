@@ -35,7 +35,6 @@ export const routes: Routes = [
   {
     path: '',
     component: PublicLayout,
-    canActivate: [authGuard],
     children: [
       { path: '', component: Landing, pathMatch: 'full' },
 
@@ -51,6 +50,7 @@ export const routes: Routes = [
   {
     path: '',
     component: PortalLayout,
+    canActivate: [authGuard],
     children: [
       { path: 'dashboard', component: Dashboard },
       // Cada sección monta su arreglo de rutas bajo un prefijo
