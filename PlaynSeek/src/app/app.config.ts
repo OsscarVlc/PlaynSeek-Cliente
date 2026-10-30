@@ -4,12 +4,13 @@ import { provideRouter } from '@angular/router';
 
 import { routes } from './app.routes';
 import { errorInterceptor } from '@core/interceptors/error-interceptor';
+import { tokenInterceptor } from '@core/interceptors/token-interceptor';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideRouter(routes),
-    // Registra HttpClient para toda la app y se agrega el interceptor de errores
-    provideHttpClient(withInterceptors([errorInterceptor])),
+    // primero el token modifica la peticion que sale, y el de errores atrapa lo que regrese del back.
+    provideHttpClient(withInterceptors([tokenInterceptor, errorInterceptor])),
   ],
 };
