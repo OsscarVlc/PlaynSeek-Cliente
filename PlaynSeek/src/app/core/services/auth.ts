@@ -19,7 +19,7 @@ interface RespuestaLogin {
 // El back responde esto en GET /user/me (viene del token, sin consultar la base)
 interface RespuestaMe {
   message: string;
-  user: { id: string; correo: string; rol: Rol };
+  user: { id: string; correo: string; rol: Rol; nombre: string; foto_perfil?: string };
 }
 
 const CLAVE_TOKEN = 'pns_token';
@@ -91,16 +91,16 @@ export class Auth {
   }
 
 
-  // GET /user/me: trae id, correo y rol, y los deja como usuario actual
-  // como back no devuelve el nombre  usamos el correo para mostrarlo
+  // GET /user/me: trae id, correo y rol, etc y los deja como usuario actual
   cargarUsuario(): Observable<RespuestaMe> {
     return this.http.get<RespuestaMe>(environment.apiUrl + '/user/me').pipe(
       tap((respuesta) => {
-        this.usuarioActual = {
+         this.usuarioActual = {
           _id: respuesta.user.id,
-          nombre: respuesta.user.correo,
+          nombre: respuesta.user.nombre,
           correo: respuesta.user.correo,
           rol: respuesta.user.rol,
+          foto_perfil: respuesta.user.foto_perfil,
           isActive: true,
           correo_confirmado: true,
         };
