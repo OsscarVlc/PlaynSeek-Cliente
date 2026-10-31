@@ -17,109 +17,111 @@
     </a>
   </header>
 
+
   <div class="herramientas">
-    <div class="filtros" role="group" aria-label="Filtrar grupos">
-      <button
-        type="button"
-        [class.seleccionado]="filtro() === 'todos'"
-        [attr.aria-pressed]="filtro() === 'todos'"
-        (click)="filtro.set('todos')"
-      >
-        Todos
-      </button>
-
-      <button
-        type="button"
-        [class.seleccionado]="filtro() === 'mios'"
-        [attr.aria-pressed]="filtro() === 'mios'"
-        (click)="filtro.set('mios')"
-      >
-        Mis grupos
-      </button>
-    </div>
-
     <div class="buscador">
       <label for="buscar-grupo">Buscar comunidad</label>
-      <input
-        #buscador
-        id="buscar-grupo"
-        type="search"
-        placeholder="Nombre o juego..."
-        [value]="busqueda()"
-        (input)="busqueda.set(buscador.value)"
-      />
+      <div class="buscador-fila">
+        <input
+          #buscador
+          id="buscar-grupo"
+          type="search"
+          placeholder="Nombre del grupo..."
+          [value]="busqueda()"
+          (input)="busqueda.set(buscador.value)"
+          (keyup.enter)="buscar()"
+        />
+        <button type="button" class="boton-buscar" (click)="buscar()">Buscar</button>
+      </div>
     </div>
   </div>
 
-  <p class="resultados" role="status">
-    {{ gruposVisibles().length }}
-    {{ gruposVisibles().length === 1 ? 'comunidad encontrada' : 'comunidades encontradas' }}
-  </p>
 
-  <div class="grupos-grid">
-    @for (grupo of gruposVisibles(); track grupo.id) {
-      <article class="grupo-card">
-        <div
-          class="portada"
-          [class.portada-verde]="grupo.tono === 'verde'"
-          [class.portada-rosa]="grupo.tono === 'rosa'"
-        >
-          @if (grupo.imagen) {
-            <img [src]="grupo.imagen" alt="" />
-          }
+  @if (cargando()) {
+    <div class="estado-centro" role="status">
+      <div class="spinner-border" aria-hidden="true"></div>
+      <p>Cargando grupos...</p>
+    </div>
+  }
 
-          <span class="simbolo" aria-hidden="true">
-            {{ grupo.nombre.charAt(0) }}
-          </span>
 
-          <span class="juego">{{ grupo.juego }}</span>
-        </div>
+  @else if (error()) {
+    <div class="estado-vacio">
+      <h2>No pudimos cargar los grupos</h2>
+      <p>Revisa tu conexión e inténtalo de nuevo.</p>
+      <button type="button" (click)="cargar()">Reintentar</button>
+    </div>
+  }
 
-        <div class="card-contenido">
-          <h2>
-            <a [routerLink]="['/grupos', grupo.id]">
-              {{ grupo.nombre }}
-            </a>
-          </h2>
 
-          <p class="integrantes-total">
-            {{ grupo.integrantes.length }}
-            {{ grupo.integrantes.length === 1 ? 'integrante' : 'integrantes' }}
-          </p>
-
-          <p class="descripcion">{{ grupo.descripcion }}</p>
-
-          <footer class="card-footer">
-            <div class="avatares" aria-label="Algunos integrantes">
-              @for (integrante of grupo.integrantes.slice(0, 3); track integrante.id) {
-                <span
-                  class="avatar"
-                  [title]="integrante.nombre"
-                  [attr.aria-label]="integrante.nombre"
-                >
-                  {{ integrante.iniciales }}
-                </span>
-              }
-            </div>
-
-            <a
-              class="ver-grupo"
-              [routerLink]="['/grupos', grupo.id]"
-              [attr.aria-label]="'Ver grupo ' + grupo.nombre"
-            >
-              Ver grupo <span aria-hidden="true">↗</span>
-            </a>
-          </footer>
-        </div>
-      </article>
-    } @empty {
-      <div class="estado-vacio">
+  @else if (grupos().length === 0) {
+    <div class="estado-vacio">
+      @if (busquedaAplicada() !== '') {
         <h2>No encontramos comunidades</h2>
-        <p>Prueba otra búsqueda o explora todos los grupos.</p>
-        <button type="button" (click)="limpiarFiltros()">
-          Ver todos los grupos
+        <p>No hay grupos con «{{ busquedaAplicada() }}». Prueba con otro nombre.</p>
+        <button type="button" (click)="limpiarBusqueda()">Ver todos los grupos</button>
+      } @else {
+        <h2>Aún no hay grupos</h2>
+        <p>Sé el primero en crear una comunidad.</p>
+        <a class="crear-grupo" routerLink="/grupos/nuevo">Crear grupo</a>
+      }
+    </div>
+  }
+
+
+  @else {
+    <p class="resultados" role="status">
+      {{ total() }}
+      {{ total() === 1 ? 'comunidad encontrada' : 'comunidades encontradas' }}
+    </p>
+
+    <div class="grupos-grid">
+      @for (grupo of grupos(); track grupo._id; let i = $index) {
+        <article class="grupo-card">
+          <div [class]="'portada ' + claseTono(i)">
+            <span class="simbolo" aria-hidden="true">
+              {{ grupo.nombre.charAt(0) }}
+            </span>
+          </div>
+
+          <div class="card-contenido">
+            <h2>
+              <a [routerLink]="['/grupos', grupo._id]">{{ grupo.nombre }}</a>
+            </h2>
+
+            <p class="integrantes-total">
+              {{ grupo.integrantes?.length ?? 0 }}
+              {{ (grupo.integrantes?.length ?? 0) === 1 ? 'integrante' : 'integrantes' }}
+            </p>
+
+            <p class="descripcion">{{ grupo.descripcion || 'Sin descripción' }}</p>
+
+            <footer class="card-footer">
+              <span class="fecha">Creado el {{ formatearFecha(grupo.fecha_creacion) }}</span>
+
+              <a
+                class="ver-grupo"
+                [routerLink]="['/grupos', grupo._id]"
+                [attr.aria-label]="'Ver grupo ' + grupo.nombre"
+              >
+                Ver grupo <span aria-hidden="true">↗</span>
+              </a>
+            </footer>
+          </div>
+        </article>
+      }
+    </div>
+
+    @if (totalPaginas() > 1) {
+      <nav class="paginacion" aria-label="Paginación de grupos">
+        <button type="button" [disabled]="pagina() === 1" (click)="paginaAnterior()">
+          ← Anterior
         </button>
-      </div>
+        <span>Página {{ pagina() }} de {{ totalPaginas() }}</span>
+        <button type="button" [disabled]="pagina() === totalPaginas()" (click)="paginaSiguiente()">
+          Siguiente →
+        </button>
+      </nav>
     }
-  </div>
+  }
 </section>

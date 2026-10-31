@@ -16,6 +16,8 @@ export const GRUPOS_ROUTES: Routes = [
 
   // /grupos/nuevo  = formulario para crear un grupo
   { path: 'nuevo', component: GrupoForm },
+  
+  { path: ':id/editar', component: GrupoForm },
 
   { path: ':id', component: GrupoDetalle },
 ];
