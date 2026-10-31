@@ -1,1 +1,220 @@
-<p>recomendaciones works!</p>
+<section class="match-page" aria-labelledby="titulo-match">
+  <header class="page-header">
+    <p class="eyebrow">MENOS SOLO. MÁS EQUIPO.</p>
+    <h1 id="titulo-match">Encuentra a tu próximo compañero.</h1>
+    <p>Mismos juegos. Nuevas conexiones. Buenas partidas.</p>
+  </header>
+
+  <nav class="match-nav" aria-label="Secciones de Match">
+    <a routerLink="/match/recomendaciones" class="activa" aria-current="page">
+      Recomendaciones
+    </a>
+    <a routerLink="/match/solicitudes">Solicitudes</a>
+    <a routerLink="/match/mis-matches">Mis matches</a>
+  </nav>
+
+  @if (aviso()) {
+    <div class="aviso" role="status">
+      <span>{{ aviso() }}</span>
+      <button type="button" aria-label="Cerrar aviso" (click)="aviso.set('')">
+        Cerrar
+      </button>
+    </div>
+  }
+
+  <div class="match-grid">
+    <aside class="panel filtros">
+      <h2>Tus filtros</h2>
+
+      <label for="juego-match">Juego</label>
+      <select
+        #juegoSelect
+        id="juego-match"
+        [value]="filtroJuego()"
+        (change)="filtroJuego.set(juegoSelect.value)"
+      >
+        <option value="">Todos los juegos</option>
+        @for (juego of juegos; track juego) {
+          <option [value]="juego">{{ juego }}</option>
+        }
+      </select>
+
+      <label for="idioma-match">Idioma</label>
+      <select
+        #idiomaSelect
+        id="idioma-match"
+        [value]="filtroIdioma()"
+        (change)="filtroIdioma.set(idiomaSelect.value)"
+      >
+        <option value="">Todos los idiomas</option>
+        @for (idioma of idiomas; track idioma) {
+          <option [value]="idioma">{{ idioma }}</option>
+        }
+      </select>
+
+      <p class="nota">
+        Explora jugadores y envía una solicitud para empezar a conectar.
+      </p>
+    </aside>
+
+    <div class="recomendacion">
+      <p class="contador" role="status">
+        {{ candidatos().length }} perfiles disponibles
+      </p>
+
+      @if (candidatoActual(); as jugador) {
+        <article class="perfil-card">
+          <div class="perfil-portada">
+            <span>ENCUENTRA TU EQUIPO</span>
+          </div>
+
+          <div class="perfil-contenido">
+            <div class="avatar-grande" aria-hidden="true">
+              {{ jugador.iniciales }}
+            </div>
+
+            <h2>{{ jugador.nombre }}</h2>
+            <p class="idiomas">{{ jugador.idiomas.join(' · ') }}</p>
+            <p class="descripcion">{{ jugador.descripcion }}</p>
+
+            <h3>Sus juegos</h3>
+            <div class="juegos">
+              @for (juego of jugador.juegos; track juego) {
+                <span class="juego">{{ juego }}</span>
+              }
+            </div>
+
+            <h3>Disponibilidad</h3>
+            <p class="disponibilidad">{{ jugador.disponibilidad }}</p>
+
+            <h3>Plataformas</h3>
+            <div class="plataformas">
+              @for (plataforma of jugador.plataformas; track plataforma) {
+                <span>{{ plataforma }}</span>
+              }
+            </div>
+          </div>
+        </article>
+
+        <div class="acciones-perfil">
+          <button
+            type="button"
+            class="boton-secundario"
+            (click)="pasar(jugador)"
+          >
+            Pasar
+          </button>
+
+          <button
+            type="button"
+            class="boton-principal"
+            (click)="conectar(jugador)"
+          >
+            Enviar solicitud
+          </button>
+        </div>
+      } @else {
+        <div class="panel estado-vacio">
+          <h2>No hay más perfiles con estos filtros</h2>
+          <p>
+            Puedes cambiar los filtros o volver a ver los perfiles que pasaste.
+          </p>
+          <button
+            type="button"
+            class="boton-secundario"
+            (click)="mostrarDeNuevo()"
+          >
+            Reiniciar exploración
+          </button>
+        </div>
+      }
+    </div>
+
+    <aside class="resumen-lateral">
+      <section class="panel" aria-labelledby="titulo-matches">
+        <div class="titulo-panel">
+          <h2 id="titulo-matches">Matches recientes</h2>
+          <span class="cantidad">{{ matches().length }}</span>
+        </div>
+
+        <div class="lista-personas">
+          @for (jugador of matches().slice(0, 3); track jugador.id) {
+            <div class="persona">
+              <span class="avatar" aria-hidden="true">
+                {{ jugador.iniciales }}
+              </span>
+
+              <div class="persona-datos">
+                <strong>{{ jugador.nombre }}</strong>
+                <small>{{ jugador.juegos.join(' · ') }}</small>
+              </div>
+
+              <button
+                type="button"
+                class="boton-chat"
+                [attr.aria-label]="'Abrir chat con ' + jugador.nombre"
+                (click)="abrirChat(jugador)"
+              >
+                Chat
+              </button>
+            </div>
+          } @empty {
+            <p class="nota">Tus nuevos matches aparecerán aquí.</p>
+          }
+        </div>
+
+        <a class="ver-todos" routerLink="/match/mis-matches">
+          Ver todos mis matches
+        </a>
+      </section>
+
+      <section class="panel" aria-labelledby="titulo-solicitudes">
+        <div class="titulo-panel">
+          <h2 id="titulo-solicitudes">Solicitudes recibidas</h2>
+          <span class="cantidad">{{ recibidas().length }}</span>
+        </div>
+
+        @for (solicitud of recibidas().slice(0, 2); track solicitud.id) {
+          <article class="solicitud">
+            <div class="persona">
+              <span class="avatar" aria-hidden="true">
+                {{ solicitud.jugador.iniciales }}
+              </span>
+
+              <div class="persona-datos">
+                <strong>{{ solicitud.jugador.nombre }}</strong>
+                <small>{{ solicitud.jugador.juegos.join(' · ') }}</small>
+              </div>
+            </div>
+
+            <div class="acciones-solicitud">
+              <button
+                type="button"
+                class="boton-principal"
+                [attr.aria-label]="'Aceptar solicitud de ' + solicitud.jugador.nombre"
+                (click)="responder(solicitud.id, true)"
+              >
+                Aceptar
+              </button>
+
+              <button
+                type="button"
+                class="boton-secundario"
+                [attr.aria-label]="'Rechazar solicitud de ' + solicitud.jugador.nombre"
+                (click)="responder(solicitud.id, false)"
+              >
+                Rechazar
+              </button>
+            </div>
+          </article>
+        } @empty {
+          <p class="nota">No tienes solicitudes pendientes.</p>
+        }
+
+        <a class="ver-todos" routerLink="/match/solicitudes">
+          Ver todas las solicitudes
+        </a>
+      </section>
+    </aside>
+  </div>
+</section>

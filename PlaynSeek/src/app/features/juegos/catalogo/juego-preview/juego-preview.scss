@@ -1,0 +1,30 @@
+:host { display: block; }
+.panel-preview { position: sticky; top: 1rem; overflow: hidden; }
+.preview-barra { display: flex; justify-content: space-between; align-items: center; padding: .7rem 1rem; border-bottom: 1px solid var(--pns-color-borde); font-size: .72rem; font-weight: 700; color: var(--pns-color-texto-suave); }
+.boton-cerrar-preview { border: 0; background: transparent; color: var(--pns-color-texto-suave); cursor: pointer; }
+.preview-banner {
+  position: relative; height: 165px; overflow: hidden;
+  img { width: 100%; height: 100%; object-fit: cover; }
+  .banner-respaldo { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: #211d36; color: var(--pns-color-acento); font-size: 2.4rem; }
+  .banner-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(24,25,35,.95), transparent 60%); display: flex; align-items: flex-end; padding: .75rem 1rem; }
+}
+.rating-rawg { padding: .2rem .55rem; border-radius: 7px; background: rgba(16,17,22,.85); border: 1px solid var(--pns-color-borde); font-size: .74rem; i { color: var(--pns-color-acento); margin-right: .25rem; } }
+.preview-contenido { padding: 1rem 1.1rem; }
+.preview-titulo { margin: 0; font-size: 1.3rem; font-weight: 700; }
+.preview-estudio, .preview-descripcion, .lanzamiento-texto { color: var(--pns-color-texto-suave); font-size: .8rem; margin-bottom: .6rem; display: block; }
+.chip-genero { padding: .15rem .45rem; border-radius: 6px; background: #212330; color: var(--pns-color-texto-suave); font-size: .7rem; font-weight: 600; }
+.boton-ir-ficha { padding: .28rem .6rem; border-radius: 7px; border: 1px solid var(--pns-color-borde); background: #13141c; color: var(--pns-color-acento); font-size: .74rem; font-weight: 600; text-decoration: none; cursor: pointer; }
+.plat-linea { display: flex; align-items: center; gap: .4rem; font-size: .8rem; }
+.caja-estado-jugador { padding: .8rem; border-radius: 10px; border: 1px solid var(--pns-color-borde); background: #13141c; margin: .8rem 0; }
+.fila-switch, .fila-acciones-estado, .squad-cabecera { display: flex; justify-content: space-between; align-items: center; gap: .5rem; margin-bottom: .55rem; h3 { margin: 0; font-size: .95rem; } p { margin: 0; font-size: .73rem; color: var(--pns-color-texto-suave); } }
+.interruptor { width: 38px; height: 22px; padding: 2px; border-radius: 99px; border: 1px solid var(--pns-color-borde); background: #252736; cursor: pointer; display: flex; align-items: center; .interruptor-circulo { width: 16px; height: 16px; border-radius: 50%; background: #fff; } &.encendido { background: #7c6cff; .interruptor-circulo { transform: translateX(16px); } } }
+.check-squad { display: inline-flex; align-items: center; gap: .4rem; font-size: .8rem; cursor: pointer; input { accent-color: var(--pns-color-primario); } }
+.nota-visibilidad, .nota-privacidad { margin: .35rem 0 0; font-size: .72rem; color: var(--pns-color-texto-suave); }
+.en-linea { display: inline-flex; align-items: center; gap: .35rem; font-size: .74rem; color: var(--pns-color-texto-suave); }
+.punto-verde { width: 7px; height: 7px; border-radius: 50%; background: var(--pns-color-primario); }
+.lista-jugadores { display: flex; flex-direction: column; gap: .45rem; margin-bottom: .7rem; }
+.jugador-item { display: flex; align-items: center; gap: .55rem; padding: .48rem .6rem; border-radius: 9px; background: #13141c; border: 1px solid var(--pns-color-borde); }
+.jugador-avatar { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: var(--pns-color-acento-fondo); color: var(--pns-color-acento); font-size: .74rem; font-weight: 700; }
+.jugador-info { flex: 1; min-width: 0; strong { display: block; font-size: .8rem; } span { display: block; font-size: .7rem; color: var(--pns-color-texto-suave); } }
+.boton-conectar { padding: .28rem .6rem; border-radius: 7px; border: 1px solid rgba(188,255,98,.45); background: rgba(188,255,98,.12); color: var(--pns-color-primario); font-size: .74rem; font-weight: 700; cursor: pointer; &.conectado { border-color: var(--pns-color-acento-fuerte); background: var(--pns-color-acento-fondo); color: var(--pns-color-acento); } }
+.ver-todos-jugadores { color: var(--pns-color-acento); font-size: .8rem; font-weight: 600; text-decoration: none; display: flex; justify-content: space-between; }

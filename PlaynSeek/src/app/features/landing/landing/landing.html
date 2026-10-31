@@ -1,1 +1,257 @@
-<p>landing works!</p>
+<!-- ===================== HERO ===================== -->
+<section class="hero">
+  <div class="contenedor hero-contenido">
+    <p class="etiqueta"><span class="punto"></span>MENOS COLA EN SOLITARIO. MÁS GG.</p>
+
+    <h1>Encuentra a tu próximo <span class="resalte">escuadrón</span></h1>
+
+    <p class="descripcion">
+      Piensa en Tinder, pero para compañeros de equipo. Haz match con jugadores que comparten
+      tus juegos, idiomas y horarios. Encuentra a tu gente. Luego dale a jugar.
+    </p>
+
+    <div class="botones">
+      <a class="btn btn-pns btn-lg" routerLink="/registro">
+        Empezar <i class="bi bi-arrow-up-right ms-1"></i>
+      </a>
+      <a class="boton-secundario" routerLink="/juegos">Explorar juegos</a>
+    </div>
+
+    <div class="prueba-social">
+      <div class="avatares">
+        @for (inicial of avatares; track inicial) {
+          <span class="avatar-mini">{{ inicial }}</span>
+        }
+      </div>
+      <span><strong>12,000+</strong> jugadores. Un hueco vacío menos.</span>
+    </div>
+  </div>
+</section>
+
+<!-- ================= FRANJA DE ESTADÍSTICAS ================= -->
+<section class="estadisticas">
+  <div class="contenedor estadisticas-contenido">
+    <div>
+      <strong>El lobby se está llenando.</strong>
+      <p class="texto-suave small mb-0">Buenos compañeros ya están aquí.</p>
+    </div>
+
+    @for (dato of estadisticas; track dato.texto) {
+      <div>
+        <p class="numero">{{ dato.valor }}</p>
+        <p class="texto-suave small mb-0">{{ dato.texto }}</p>
+      </div>
+    }
+
+    <span class="insignia-en-linea"><span class="punto"></span>BUSCADOR EN LÍNEA</span>
+  </div>
+</section>
+
+<!-- ================= CÓMO FUNCIONA ================= -->
+<section class="seccion">
+  <div class="contenedor">
+    <p class="etiqueta-seccion">TU PARTY, EN TRES PASOS</p>
+    <h2 class="titulo-seccion">De la cola en solitario a objetivos de squad.</h2>
+
+    <div class="pasos">
+      @for (paso of pasos; track paso.numero) {
+        <article class="paso">
+          <div class="paso-cabecera">
+            <span class="paso-numero">{{ paso.numero }}</span>
+            <i [class]="'bi ' + paso.icono"></i>
+          </div>
+          <h5>{{ paso.titulo }}</h5>
+          <p class="texto-suave mb-0">{{ paso.texto }}</p>
+        </article>
+      }
+    </div>
+  </div>
+</section>
+
+
+<!-- ================= BLOQUES DE FUNCIONES ================= -->
+<section class="seccion seccion-alterna">
+  <div class="contenedor">
+    <p class="etiqueta-seccion">HECHO PARA TU FORMA DE JUGAR</p>
+    <h2 class="titulo-seccion">Mejor química. Mejores partidas.</h2>
+
+    @for (funcion of funciones; track funcion.tipo; let i = $index) {
+      <article class="funcion" [class.invertido]="i % 2 === 1">
+        <div class="funcion-texto">
+          <p class="etiqueta-mini">{{ funcion.etiqueta }}</p>
+          <h3>{{ funcion.titulo }}</h3>
+          <p class="texto-suave">{{ funcion.texto }}</p>
+
+          <ul class="puntos">
+            @for (punto of funcion.puntos; track punto) {
+              <li><i class="bi bi-check-circle-fill"></i>{{ punto }}</li>
+            }
+          </ul>
+        </div>
+
+        <div class="funcion-visual pns-tarjeta">
+          @switch (funcion.tipo) {
+            @case ('compatibilidad') {
+              <div class="visual-cabecera">
+                <strong>Luna.exe</strong>
+                <span class="porcentaje">92% compatible</span>
+              </div>
+
+              @for (barra of barras; track barra.nombre) {
+                <div class="barra-fila">
+                  <span class="small">{{ barra.nombre }}</span>
+                  <div class="barra-fondo">
+                    <div class="barra-relleno" [style.width.%]="barra.valor"></div>
+                  </div>
+                </div>
+              }
+            }
+
+            @case ('chat') {
+              <div class="conversacion">
+                @for (mensaje of mensajes; track mensaje.texto) {
+                  <div class="burbuja" [class.propia]="mensaje.propio">
+                    {{ mensaje.texto }}
+                  </div>
+                }
+              </div>
+            }
+
+            @case ('grupos') {
+              <div class="visual-cabecera">
+                <strong>Valorant Nocturno</strong>
+                <span class="chip">12 integrantes</span>
+              </div>
+
+              <div class="pestanas">
+                <span class="pestana activa">Posts</span>
+                <span class="pestana">Chat</span>
+                <span class="pestana">Integrantes</span>
+              </div>
+
+              <div class="avatares-grupo">
+                @for (miembro of miembros; track miembro) {
+                  <span class="avatar-mini">{{ miembro }}</span>
+                }
+              </div>
+
+              <a class="btn btn-pns btn-sm mt-3" routerLink="/grupos">Ver grupos</a>
+            }
+          }
+        </div>
+      </article>
+    }
+  </div>
+</section>
+
+<!-- ================= JUEGOS DESTACADOS ================= -->
+<section class="seccion">
+  <div class="contenedor">
+    <div class="seccion-cabecera">
+      <div>
+        <p class="etiqueta-seccion">ELIGE TU CAMPO DE JUEGO</p>
+        <h2 class="titulo-seccion mb-0">Tu juego. Tu gente.</h2>
+      </div>
+      <a class="enlace-ver-todos" routerLink="/juegos">
+        Explorar todos los juegos <i class="bi bi-arrow-right"></i>
+      </a>
+    </div>
+
+    <div class="cuadricula-juegos">
+      @for (juego of juegosDestacados; track juego._id) {
+        <app-game-card [juego]="juego"></app-game-card>
+      }
+    </div>
+  </div>
+</section>
+
+
+<!-- ================= COMUNIDADES ================= -->
+<section class="seccion">
+  <div class="contenedor">
+    <div class="seccion-cabecera">
+      <div>
+        <p class="etiqueta-seccion">ENCUENTRA TU LUGAR</p>
+        <h2 class="titulo-seccion mb-0">No busques solo un dúo. Encuentra un crew.</h2>
+      </div>
+      <a class="enlace-ver-todos" routerLink="/grupos">
+        Explorar grupos <i class="bi bi-arrow-right"></i>
+      </a>
+    </div>
+
+    <div class="comunidades">
+      @for (comunidad of comunidades; track comunidad.nombre) {
+        <article class="comunidad pns-tarjeta">
+          <div [class]="'comunidad-cabecera ' + comunidad.tono">
+            <i [class]="'bi ' + comunidad.icono"></i>
+            <span class="comunidad-juego">{{ comunidad.juego }}</span>
+          </div>
+
+          <div class="comunidad-cuerpo">
+            <h5>{{ comunidad.nombre }}</h5>
+            <p class="texto-suave small mb-2">{{ comunidad.integrantes }}</p>
+            <p class="texto-suave">{{ comunidad.descripcion }}</p>
+
+            <div class="comunidad-pie">
+              <div class="avatares">
+                @for (miembro of comunidad.miembros; track miembro) {
+                  <span class="avatar-mini">{{ miembro }}</span>
+                }
+              </div>
+              <a class="enlace-ver-todos" routerLink="/grupos">
+                Encuentra tu crew <i class="bi bi-arrow-up-right"></i>
+              </a>
+            </div>
+          </div>
+        </article>
+      }
+    </div>
+  </div>
+</section>
+
+<!-- ===================== FOOTER ===================== -->
+<footer class="pie">
+  <div class="contenedor pie-contenido">
+    <div class="pie-marca">
+      <div class="pie-logo">
+        <span class="pie-logo-icono"><i class="bi bi-controller"></i></span>
+        Play N Seek
+      </div>
+      <p class="texto-suave small">
+        Menos cola en solitario, más GG. Encuentra a tu próximo escuadrón.
+      </p>
+
+      <div class="redes">
+        @for (red of redes; track red.nombre) {
+          <button type="button" class="red" [attr.aria-label]="red.nombre">
+            <i [class]="'bi ' + red.icono"></i>
+          </button>
+        }
+      </div>
+    </div>
+
+    <!-- Las tres columnas de enlaces -->
+    @for (columna of columnasPie; track columna.titulo) {
+      <div>
+        <h6 class="pie-titulo">{{ columna.titulo }}</h6>
+        <ul class="pie-lista">
+          @for (enlace of columna.enlaces; track enlace.texto) {
+            <li>
+              @if (enlace.ruta) {
+                <a [routerLink]="enlace.ruta">{{ enlace.texto }}</a>
+              } @else {
+                <span>{{ enlace.texto }}</span>
+              }
+            </li>
+          }
+        </ul>
+      </div>
+    }
+  </div>
+
+  <!-- Franja inferior con el copyright -->
+  <div class="contenedor pie-inferior">
+    <span>© {{ anio }} Play N Seek. Todos los derechos reservados.</span>
+    <span>Hecho por gamers, para gamers.</span>
+  </div>
+</footer>

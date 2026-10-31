@@ -1,11 +1,19 @@
-import { ApplicationConfig, provideBrowserGlobalErrorListeners } from '@angular/core';
+import { ApplicationConfig, inject, provideAppInitializer, provideBrowserGlobalErrorListeners } from '@angular/core';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { provideRouter } from '@angular/router';
 
 import { routes } from './app.routes';
+import { errorInterceptor } from '@core/interceptors/error-interceptor';
+import { tokenInterceptor } from '@core/interceptors/token-interceptor';
+import { Auth } from '@core/services/auth';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
-    provideRouter(routes)
-  ]
+    provideRouter(routes),
+    // primero el token modifica la peticion que sale, y el de errores atrapa lo que regrese del back.
+    provideHttpClient(withInterceptors([tokenInterceptor, errorInterceptor])),
+    // Antes de mostrar nada, recupera la sesión si hay un token guardado
+    //provideAppInitializer(() => inject(Auth).recuperarSesion()),
+  ],
 };

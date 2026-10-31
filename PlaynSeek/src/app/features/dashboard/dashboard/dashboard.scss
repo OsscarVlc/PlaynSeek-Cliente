@@ -1,0 +1,211 @@
+.texto-suave {
+  color: var(--pns-color-texto-suave);
+}
+
+// ===================== CABECERA =====================
+.cabecera {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.75rem;
+
+  h2 {
+    margin: 0.25rem 0;
+    font-size: clamp(1.8rem, 4vw, 2.4rem);
+    font-weight: 700;
+  }
+}
+
+.etiqueta {
+  color: var(--pns-color-primario);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  margin: 0;
+}
+
+.acciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.boton-secundario {
+  display: inline-flex;
+  align-items: center;
+  background-color: var(--pns-color-tarjeta);
+  border: 1px solid var(--pns-color-borde);
+  border-radius: 8px;
+  color: var(--pns-color-texto);
+  font-size: 0.9rem;
+  padding: 0.4rem 1rem;
+  text-decoration: none;
+
+  &:hover {
+    border-color: var(--pns-color-acento-fuerte);
+    color: var(--pns-color-texto);
+  }
+}
+
+// ===================== NUMEROS RAPIDOS =====================
+.estadisticas {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.estadistica {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.1rem 1.25rem;
+  color: var(--pns-color-texto);
+  text-decoration: none;
+  transition:
+    border-color 0.2s,
+    transform 0.2s;
+
+  &:hover {
+    border-color: var(--pns-color-acento-fuerte);
+    transform: translateY(-3px);
+    color: var(--pns-color-texto);
+  }
+
+  i {
+    color: var(--pns-color-acento);
+    font-size: 1.5rem;
+  }
+}
+
+.numero {
+  font-family: var(--pns-fuente-titulo);
+  font-size: 1.7rem;
+  font-weight: 700;
+  line-height: 1;
+  margin: 0 0 0.2rem;
+}
+
+// ===================== PANELES =====================
+.columnas {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 2.5rem;
+}
+
+.panel {
+  padding: 1.25rem;
+}
+
+.panel-cabecera {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+
+  h5 {
+    margin: 0;
+  }
+}
+
+.enlace {
+  color: var(--pns-color-primario);
+  font-size: 0.82rem;
+  font-weight: 600;
+  text-decoration: none;
+
+  &:hover {
+    color: var(--pns-color-primario-hover);
+  }
+}
+
+
+.fila {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.65rem 0;
+}
+
+.fila-texto {
+  flex: 1;
+  min-width: 0;
+}
+
+
+.avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background-color: var(--pns-color-acento-fondo);
+  color: var(--pns-color-acento);
+  font-weight: 700;
+}
+
+.boton-icono {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  border: 1px solid var(--pns-color-borde);
+  color: var(--pns-color-acento);
+  text-decoration: none;
+
+  &:hover {
+    border-color: var(--pns-color-acento-fuerte);
+  }
+}
+
+.porcentaje {
+  background-color: var(--pns-color-acento-fondo);
+  color: var(--pns-color-primario);
+  border-radius: 6px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.25rem 0.5rem;
+}
+
+
+.solicitud {
+  padding: 0.5rem 0 0.9rem;
+  border-bottom: 1px solid var(--pns-color-borde);
+
+  &:last-child {
+    border-bottom: 0;
+  }
+}
+
+.solicitud-botones {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.4rem;
+}
+
+// ===================== JUEGOS RECOMENDADOS =====================
+.seccion {
+  margin-bottom: 1rem;
+}
+
+.cuadricula-juegos {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1.25rem;
+}
+
+@media (max-width: 900px) {
+  .estadisticas {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .columnas {
+    grid-template-columns: 1fr;
+  }
+}

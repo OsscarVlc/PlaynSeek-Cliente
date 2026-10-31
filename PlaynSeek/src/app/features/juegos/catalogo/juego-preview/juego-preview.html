@@ -1,0 +1,183 @@
+<aside
+  class="panel-preview pns-tarjeta"
+  aria-label="Vista previa del juego seleccionado"
+>
+  <div class="preview-barra">
+    <span class="preview-etiqueta">
+      <i class="bi bi-layout-sidebar-reverse me-1" aria-hidden="true"></i>
+      VISTA PREVIA DEL JUEGO
+    </span>
+    <button
+      type="button"
+      class="boton-cerrar-preview"
+      (click)="cerrar.emit()"
+      aria-label="Cerrar vista previa"
+    >
+      <i class="bi bi-x-lg" aria-hidden="true"></i>
+    </button>
+  </div>
+
+  <div class="preview-banner">
+    <div class="banner-respaldo">
+      <i class="bi bi-controller" aria-hidden="true"></i>
+    </div>
+    <div class="banner-overlay">
+      <span class="rating-rawg" [appRatingBadge]="meta.rating">
+        <i class="bi bi-star-fill" aria-hidden="true"></i>
+        <strong>{{ meta.rating }} / 5</strong>
+        <small class="ms-1">RAWG</small>
+      </span>
+    </div>
+  </div>
+
+  <div class="preview-contenido">
+    <div class="d-flex justify-content-between align-items-start gap-2">
+      <div>
+        <h2 class="preview-titulo">{{ juego.titulo }}</h2>
+        <p class="preview-estudio">Desarrollado por {{ meta.desarrollador }}</p>
+      </div>
+      <a
+        [routerLink]="['/juegos', juego._id]"
+        class="boton-ir-ficha"
+        title="Abrir pantalla completa del juego"
+      >
+        Abrir ficha ↗
+      </a>
+    </div>
+
+    <div class="d-flex flex-wrap gap-1 mb-2">
+      @for (gen of juego.generos; track gen) {
+        <span class="chip-genero">{{ gen }}</span>
+      }
+    </div>
+
+    <p class="preview-descripcion">{{ meta.descripcion }}</p>
+
+    <div class="mb-3">
+      <div class="plat-linea">
+        @for (plat of juego.plataformas; track plat) {
+          <i
+            [class]="'bi ' + juegosDemo.iconoPlataforma(plat)"
+            aria-hidden="true"
+          ></i>
+        }
+        <span>
+          {{
+            juego.plataformas
+              .map((p) => juegosDemo.etiquetaPlataforma(p))
+              .join(' · ')
+          }}
+        </span>
+      </div>
+      <small class="lanzamiento-texto">
+        Lanzamiento {{ meta.lanzamiento }} · Publicado por
+        {{ meta.distribuidor }} · RAWG #{{ juego.id_api }}
+      </small>
+    </div>
+
+    <div class="caja-estado-jugador">
+      <div class="fila-switch">
+        <div class="d-flex align-items-center gap-2 fw-semibold small">
+          <i class="bi bi-controller text-primary" aria-hidden="true"></i>
+          <span>Jugando actualmente</span>
+        </div>
+        <button
+          type="button"
+          class="interruptor"
+          role="switch"
+          [class.encendido]="juegosDemo.estaJugandoActualmente(juego._id)"
+          [attr.aria-checked]="juegosDemo.estaJugandoActualmente(juego._id)"
+          (click)="alternarJugando.emit(juego)"
+        >
+          <span class="interruptor-circulo"></span>
+        </button>
+      </div>
+
+      <div class="fila-acciones-estado">
+        <label class="check-squad">
+          <input
+            type="checkbox"
+            [checked]="juegosDemo.estaBuscandoEquipo(juego._id)"
+            (change)="alternarSquad.emit(juego)"
+          />
+          <span>Buscando squad</span>
+        </label>
+
+        <button
+          type="button"
+          class="boton-ir-ficha"
+          (click)="marcarJugadoAntes.emit(juego)"
+        >
+          <i class="bi bi-clock-history me-1" aria-hidden="true"></i>
+          {{
+            juegosDemo.fueJugadoAntes(juego._id)
+              ? 'En jugados antes'
+              : 'Jugado antes'
+          }}
+        </button>
+      </div>
+
+      <p class="nota-visibilidad">
+        @if (juegosDemo.estaBuscandoEquipo(juego._id)) {
+          Eres visible para otros jugadores de {{ juego.titulo }}.
+        } @else {
+          Activa «Buscando squad» para aparecer en las recomendaciones de este
+          juego.
+        }
+      </p>
+    </div>
+
+    <div>
+      <div class="squad-cabecera">
+        <div>
+          <h3>Buscando squad</h3>
+          <p>Encuentra equipo para misiones, ranked o partidas casuales.</p>
+        </div>
+        <span class="en-linea">
+          <span class="punto-verde" aria-hidden="true"></span>
+          {{ meta.enLinea }} en línea
+        </span>
+      </div>
+
+      <div class="lista-jugadores">
+        @for (jugador of jugadores; track jugador.id) {
+          <div class="jugador-item">
+            <div class="jugador-avatar">{{ jugador.iniciales }}</div>
+            <div class="jugador-info">
+              <strong>{{ jugador.nombre }}</strong>
+              <span>
+                {{ jugador.plataformaEtiqueta }} · {{ jugador.actividad }}
+              </span>
+            </div>
+            <button
+              type="button"
+              class="boton-conectar"
+              [class.conectado]="jugador.conectado"
+              (click)="conectar.emit(jugador)"
+            >
+              <i
+                class="bi"
+                [class.bi-person-plus-fill]="!jugador.conectado"
+                [class.bi-check2]="jugador.conectado"
+                aria-hidden="true"
+              ></i>
+              {{ jugador.conectado ? 'Conectado' : 'Conectar' }}
+            </button>
+          </div>
+        }
+      </div>
+
+      <a [routerLink]="['/juegos', juego._id]" class="ver-todos-jugadores">
+        <span>
+          Ver los {{ meta.buscandoSquad }} jugadores y grupos del juego
+        </span>
+        <i class="bi bi-arrow-right" aria-hidden="true"></i>
+      </a>
+
+      <p class="nota-privacidad">
+        <i class="bi bi-shield-check me-1" aria-hidden="true"></i>
+        Los gamertags permanecen privados hasta hacer match.
+      </p>
+    </div>
+  </div>
+</aside>

@@ -1,10 +1,60 @@
-<nav class="navbar navbar-dark bg-dark px-3">
-  <a class="navbar-brand" routerLink="/dashboard">Play N Seek</a>
-  <div class="d-flex align-items-center gap-3">
-    <span class="text-light">{{ auth.usuarioActual?.nombre }}</span>
-    <a class="btn btn-outline-light btn-sm" routerLink="/perfil">Mi perfil</a>
-    <button type="button" class="btn btn-outline-danger btn-sm" (click)="salir()">
-      Cerrar sesión
-    </button>
+<nav class="barra">
+  <div class="barra-contenido">
+    <a class="marca" [routerLink]="auth.estaAutenticado() ? '/dashboard' : '/'">
+      <span class="marca-icono"><i class="bi bi-controller"></i></span>
+      Play N Seek
+    </a>
+    <div class="enlaces">
+      <a routerLink="/juegos" routerLinkActive="activo">Juegos</a>
+      <a routerLink="/match" routerLinkActive="activo">Match</a>
+      <a routerLink="/grupos" routerLinkActive="activo">Grupos</a>
+
+      @if (auth.estaAutenticado()) {
+        <a routerLink="/chat/u2" routerLinkActive="activo">Mensajes</a>
+        <a routerLink="/perfil" routerLinkActive="activo">Mi perfil</a>
+      }
+    </div>
+
+    <div class="acciones">
+      @if (auth.estaAutenticado()) {
+        <button type="button" class="campana" (click)="verNotificaciones()">
+          <i class="bi bi-bell"></i>
+          <span class="punto"></span>
+        </button>
+
+        <div class="dropdown">
+          <button type="button" class="usuario-boton" data-bs-toggle="dropdown">
+            <span class="avatar">{{ inicial() }}</span>
+            <span>{{ auth.usuarioActual?.nombre }}</span>
+            <i class="bi bi-chevron-down"></i>
+          </button>
+
+          <ul class="dropdown-menu dropdown-menu-end">
+
+            @if (auth.tieneRol(['administrador', 'moderador'])) {
+              <li>
+                <a class="dropdown-item" routerLink="/moderacion/reportes">Reportes</a>
+              </li>
+            }
+            @if (auth.tieneRol(['administrador'])) {
+              <li>
+                <a class="dropdown-item" routerLink="/admin/usuarios">Usuarios</a>
+              </li>
+            }
+            @if (auth.tieneRol(['administrador', 'moderador'])) {
+              <li><hr class="dropdown-divider" /></li>
+            }
+            <li>
+              <button type="button" class="dropdown-item text-danger" (click)="salir()">
+                Cerrar sesión
+              </button>
+            </li>
+          </ul>
+        </div>
+      } @else {
+        <a class="boton-secundario" routerLink="/login">Iniciar sesión</a>
+        <a class="boton-primario" routerLink="/registro">Registrarse</a>
+      }
+    </div>
   </div>
 </nav>

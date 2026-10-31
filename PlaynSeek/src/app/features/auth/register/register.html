@@ -1,1 +1,242 @@
-<p>register works!</p>
+<section class="auth-pagina" aria-labelledby="titulo-registro">
+  <div class="auth-contenedor">
+    <div class="barra-superior">
+      <a routerLink="/" class="enlace-volver">
+        <i class="bi bi-arrow-left" aria-hidden="true"></i>
+        Volver al inicio
+      </a>
+    </div>
+
+    <div class="auth-tarjeta pns-tarjeta">
+      <header class="auth-cabecera">
+        <h1 id="titulo-registro">Únete al Squad</h1>
+        <p class="subtitulo">
+          Encuentra jugadores que coincidan con tu juego, horario y estilo
+        </p>
+      </header>
+
+      <button
+        type="button"
+        class="boton-google"
+        (click)="registrarseConGoogle()"
+      >
+        <i class="bi bi-google" aria-hidden="true"></i>
+        <span>Registrarse con Google</span>
+      </button>
+
+      <div class="separador" role="separator">
+        <span>O REGÍSTRATE CON TU CORREO</span>
+      </div>
+
+      <form [formGroup]="formulario" (ngSubmit)="crearCuenta()" novalidate>
+        <div class="campo">
+          <label for="nombre-registro">Nombre visible / Usuario</label>
+          <div
+            class="input-icono"
+            [class.invalido]="
+              formulario.controls.nombre.touched &&
+              formulario.controls.nombre.invalid
+            "
+          >
+            <i class="bi bi-person icono-izquierdo" aria-hidden="true"></i>
+            <input
+              id="nombre-registro"
+              type="text"
+              formControlName="nombre"
+              placeholder="Ej. Nightfall"
+              autocomplete="nickname"
+            />
+          </div>
+          @if (
+            formulario.controls.nombre.touched &&
+            formulario.controls.nombre.invalid
+          ) {
+            <p class="mensaje-error" role="alert">
+              El nombre debe tener entre 3 y 40 caracteres.
+            </p>
+          }
+        </div>
+
+        <div class="campo">
+          <label for="correo-registro">Correo electrónico</label>
+          <div
+            class="input-icono"
+            [class.invalido]="
+              formulario.controls.correo.touched &&
+              formulario.controls.correo.invalid
+            "
+          >
+            <i class="bi bi-envelope icono-izquierdo" aria-hidden="true"></i>
+            <input
+              id="correo-registro"
+              type="email"
+              formControlName="correo"
+              placeholder="nightfall@ejemplo.com"
+              autocomplete="email"
+            />
+          </div>
+          @if (
+            formulario.controls.correo.touched &&
+            formulario.controls.correo.invalid
+          ) {
+            <p class="mensaje-error" role="alert">
+              Ingresa una dirección de correo electrónico válida.
+            </p>
+          }
+        </div>
+
+        <div class="campo">
+          <label for="password-registro">Contraseña</label>
+          <div
+            class="input-icono"
+            [class.invalido]="
+              formulario.controls.password.touched &&
+              formulario.controls.password.invalid
+            "
+          >
+            <i class="bi bi-lock icono-izquierdo" aria-hidden="true"></i>
+            <input
+              #passInput
+              id="password-registro"
+              [type]="mostrarPassword() ? 'text' : 'password'"
+              formControlName="password"
+              placeholder="Ej. PlayNSeek2026!"
+              autocomplete="new-password"
+              (input)="actualizarPassword(passInput.value)"
+            />
+            <button
+              type="button"
+              class="boton-ojo"
+              (click)="alternarPassword()"
+              [attr.aria-label]="
+                mostrarPassword()
+                  ? 'Ocultar contraseña'
+                  : 'Mostrar contraseña'
+              "
+            >
+              <i
+                class="bi"
+                [class.bi-eye]="!mostrarPassword()"
+                [class.bi-eye-slash]="mostrarPassword()"
+                aria-hidden="true"
+              ></i>
+            </button>
+          </div>
+
+          <div class="fortaleza-contenedor" aria-live="polite">
+            <div class="barras-fortaleza">
+              <span
+                class="barra-item"
+                [class.activa]="nivelFortaleza() >= 1"
+              ></span>
+              <span
+                class="barra-item"
+                [class.activa]="nivelFortaleza() >= 2"
+              ></span>
+              <span
+                class="barra-item"
+                [class.activa]="nivelFortaleza() >= 3"
+              ></span>
+            </div>
+            <div class="etiquetas-fortaleza">
+              <span [class.resaltada]="nivelFortaleza() === 1">Débil</span>
+              <span [class.resaltada]="nivelFortaleza() === 2">Media</span>
+              <span [class.resaltada]="nivelFortaleza() === 3">
+                Fuerte @if (nivelFortaleza() === 3) { ✓ }
+              </span>
+            </div>
+            <p class="detalle-fortaleza">{{ detalleFortaleza() }}</p>
+          </div>
+        </div>
+
+        <div class="campo">
+          <label for="confirmar-registro">Confirmar contraseña</label>
+          <div
+            class="input-icono"
+            [class.invalido]="
+              formulario.controls.confirmarPassword.touched &&
+              !passwordsCoinciden()
+            "
+          >
+            <i class="bi bi-lock icono-izquierdo" aria-hidden="true"></i>
+            <input
+              id="confirmar-registro"
+              [type]="mostrarConfirmar() ? 'text' : 'password'"
+              formControlName="confirmarPassword"
+              placeholder="Repite tu contraseña"
+              autocomplete="new-password"
+            />
+            <button
+              type="button"
+              class="boton-ojo"
+              (click)="alternarConfirmar()"
+              [attr.aria-label]="
+                mostrarConfirmar()
+                  ? 'Ocultar confirmación'
+                  : 'Mostrar confirmación'
+              "
+            >
+              <i
+                class="bi"
+                [class.bi-eye]="!mostrarConfirmar()"
+                [class.bi-eye-slash]="mostrarConfirmar()"
+                aria-hidden="true"
+              ></i>
+            </button>
+          </div>
+          @if (
+            formulario.controls.confirmarPassword.touched &&
+            !passwordsCoinciden()
+          ) {
+            <p class="mensaje-error" role="alert">
+              Las contraseñas no coinciden.
+            </p>
+          }
+        </div>
+
+        <div class="fila-terminos">
+          <label class="checkbox-label">
+            <input type="checkbox" formControlName="aceptaTerminos" />
+            <span>
+              Acepto los
+              <a
+                href="#"
+                class="enlace-acento"
+                (click)="verDocumento('Términos de Servicio', $event)"
+              >
+                Términos de Servicio
+              </a>
+              y el
+              <a
+                href="#"
+                class="enlace-acento"
+                (click)="verDocumento('Código de Conducta', $event)"
+              >
+                Código de Conducta
+              </a>
+            </span>
+          </label>
+        </div>
+
+        <button type="submit" class="boton-submit">
+          Crear cuenta
+        </button>
+      </form>
+
+      <footer class="auth-pie">
+        <span>¿Ya tienes una cuenta?</span>
+        <a routerLink="/login" class="enlace-acento fw-semibold">
+          Inicia sesión
+        </a>
+      </footer>
+    </div>
+
+    <div class="aviso-correo pns-tarjeta" role="note">
+      <i class="bi bi-envelope" aria-hidden="true"></i>
+      <p>
+        Se enviará un enlace de confirmación a tu correo para verificar tu
+        cuenta antes de tu primer inicio de sesión.
+      </p>
+    </div>
+  </div>
+</section>

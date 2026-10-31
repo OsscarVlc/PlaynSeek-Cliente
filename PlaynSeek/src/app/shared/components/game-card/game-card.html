@@ -1,1 +1,24 @@
-<p>game-card works!</p>
+<a [routerLink]="['/juegos', juego._id]" class="text-decoration-none text-dark">
+  <div class="card pns-tarjeta h-100">
+
+    @if (juego.imagen) {
+      <img [src]="juego.imagen" class="card-img-top portada" [alt]="juego.titulo" />
+    } @else {
+      <div class="portada sin-imagen d-flex align-items-center justify-content-center">
+        <i class="bi bi-controller fs-1"></i>
+      </div>
+    }
+
+    <div class="card-body">
+      <h6 class="card-title">{{ juego.titulo }}</h6>
+
+      <p class="card-text text-muted small mb-2">{{ juego.generos.join(', ') }}</p>
+
+      <div class="d-flex flex-wrap gap-1">
+        @for (plataforma of juego.plataformas; track plataforma) {
+          <span class="badge" [appPlatformBadge]="plataforma">{{ plataforma }}</span>
+        }
+      </div>
+    </div>
+  </div>
+</a>

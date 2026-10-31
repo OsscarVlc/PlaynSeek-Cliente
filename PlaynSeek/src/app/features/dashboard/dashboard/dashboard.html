@@ -1,5 +1,100 @@
-<button class="btn btn-success me-2" (click)="notificacion.exito('Se creó correctamente')">Éxito</button>
-<button class="btn btn-danger me-2" (click)="notificacion.error('Algo salió mal')">Error</button>
-<button class="btn btn-info me-2" (click)="notificacion.info('Dato informativo')">Info</button>
-<button class="btn btn-warning" (click)="notificacion.advertencia('Ten cuidado')">Advertencia</button>
-<button class="btn btn-dark ms-2" (click)="probarEliminar()">Probar confirmación</button>
+<!-- ===================== CABECERA ===================== -->
+<header class="cabecera">
+  <div>
+    <p class="etiqueta">TU CENTRO DE MANDO</p>
+    <h2>Hola, {{ primerNombre() }}</h2>
+    <p class="texto-suave mb-0">Esto es lo nuevo en tu squad.</p>
+  </div>
+
+  <div class="acciones">
+    <a class="btn btn-pns" routerLink="/match/recomendaciones">Encontrar compañeros</a>
+    <a class="boton-secundario" routerLink="/grupos/nuevo">Crear grupo</a>
+  </div>
+</header>
+
+<!-- ===================== NÚMEROS RÁPIDOS ===================== -->
+<section class="estadisticas">
+  @for (dato of estadisticas; track dato.texto) {
+    <a class="estadistica pns-tarjeta" [routerLink]="dato.ruta">
+      <i [class]="'bi ' + dato.icono"></i>
+      <div>
+        <p class="numero">{{ dato.valor }}</p>
+        <p class="texto-suave small mb-0">{{ dato.texto }}</p>
+      </div>
+    </a>
+  }
+</section>
+
+<!-- ============ MATCHES Y SOLICITUDES (dos columnas) ============ -->
+<section class="columnas">
+  <!-- Matches recientes -->
+  <div class="panel pns-tarjeta">
+    <div class="panel-cabecera">
+      <h5>Matches recientes</h5>
+      <a class="enlace" routerLink="/match/mis-matches">Ver todos los matches</a>
+    </div>
+
+    @for (item of matches; track item.usuarioId) {
+      @if (usuarioPorId(item.usuarioId); as u) {
+        <div class="fila">
+          <span class="avatar">{{ u.nombre.charAt(0) }}</span>
+          <div class="fila-texto">
+            <strong>{{ u.nombre }}</strong>
+            <p class="texto-suave small mb-0">
+              {{ item.juego }} · {{ item.porcentaje }}% match · {{ item.detalle }}
+            </p>
+          </div>
+          <a class="boton-icono" [routerLink]="['/chat', u._id]" aria-label="Abrir chat">
+            <i class="bi bi-chat-dots"></i>
+          </a>
+        </div>
+      }
+    }
+  </div>
+
+  <!-- Solicitudes pendientes -->
+  <div class="panel pns-tarjeta">
+    <div class="panel-cabecera">
+      <h5>Solicitudes pendientes</h5>
+      <a class="enlace" routerLink="/match/solicitudes">Ver todas</a>
+    </div>
+
+    @for (item of solicitudes; track item.usuarioId) {
+      @if (usuarioPorId(item.usuarioId); as u) {
+        <div class="solicitud">
+          <div class="fila">
+            <span class="avatar">{{ u.nombre.charAt(0) }}</span>
+            <div class="fila-texto">
+              <strong>{{ u.nombre }}</strong>
+              <p class="texto-suave small mb-0">{{ item.juego }} · {{ item.detalle }}</p>
+            </div>
+            <span class="porcentaje">{{ item.porcentaje }}%</span>
+          </div>
+
+          <div class="solicitud-botones">
+            <button type="button" class="btn btn-pns btn-sm" (click)="aceptar(u.nombre)">
+              <i class="bi bi-check-lg me-1"></i>Aceptar
+            </button>
+            <button type="button" class="boton-secundario" (click)="rechazar(u.nombre)">
+              Rechazar
+            </button>
+          </div>
+        </div>
+      }
+    }
+  </div>
+</section>
+
+<!-- ===================== JUEGOS RECOMENDADOS ===================== -->
+<section class="seccion">
+  <div class="panel-cabecera">
+    <h5>Juegos recomendados para ti</h5>
+    <a class="enlace" routerLink="/juegos">Explorar todos los juegos</a>
+  </div>
+
+  <div class="cuadricula-juegos">
+    @for (juego of juegosRecomendados; track juego._id) {
+      <app-game-card [juego]="juego"></app-game-card>
+    }
+  </div>
+</section>

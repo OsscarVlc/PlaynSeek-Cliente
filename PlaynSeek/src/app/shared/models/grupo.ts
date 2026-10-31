@@ -16,10 +16,12 @@ export interface Grupo {
   integrantes?: string[]; // ids de los usuarios que pertenecen al grupo
   activo?: boolean; // false = grupo "eliminado" (soft delete)
 
-  //Campos extra para el front
-  // Cuando el back hace populate, en vez de ids llegan los datos del
-  // usuario. Con estos campos, los mocks pueden traer el nombre y la
-  // foto ya listos y las vistas no tienen que buscar en otros arreglos.
+  // --- Campos extra SOLO para el front (la API actual no los devuelve) ---
   lider?: UsuarioResumen;
   integrantes_detalle?: UsuarioResumen[];
+}
+
+export interface DatosGrupo {
+  nombre: string;
+  descripcion?: string;
 }

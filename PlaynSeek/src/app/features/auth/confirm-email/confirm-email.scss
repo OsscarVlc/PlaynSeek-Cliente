@@ -1,0 +1,79 @@
+:host { display: block; }
+.auth-pagina {
+  min-height: calc(100vh - 70px); display: flex; align-items: center; justify-content: center;
+  padding: 2rem 1rem 3rem;
+  background: radial-gradient(circle at 50% 25%, rgba(188, 255, 98, 0.07), transparent 55%), var(--pns-color-fondo);
+}
+.auth-contenedor { width: 100%; max-width: 460px; }
+.barra-superior { display: flex; justify-content: flex-end; margin-bottom: 0.9rem; }
+.enlace-volver {
+  display: inline-flex; align-items: center; gap: 0.45rem; padding: 0.4rem 0.85rem;
+  border-radius: 8px; border: 1px solid var(--pns-color-borde); background: var(--pns-color-tarjeta);
+  color: var(--pns-color-texto-suave); font-size: 0.82rem; font-weight: 500; text-decoration: none;
+  &:hover { border-color: var(--pns-color-acento-fuerte); color: var(--pns-color-texto); }
+}
+.auth-tarjeta {
+  padding: 2.25rem 2rem; border-radius: 16px; background: var(--pns-color-tarjeta);
+  border: 1px solid var(--pns-color-borde); box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45);
+}
+.icono-cabecera {
+  width: 58px; height: 58px; margin: 0 auto 1rem; border-radius: 16px;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--pns-color-acento-fondo); border: 1px solid rgba(164, 154, 255, 0.35);
+  color: var(--pns-color-acento); font-size: 1.65rem;
+  &.verificado { background: rgba(188, 255, 98, 0.14); border-color: rgba(188, 255, 98, 0.45); color: var(--pns-color-primario); }
+}
+.insignia-pendiente, .insignia-exito {
+  display: inline-block; margin-bottom: 0.55rem; padding: 0.22rem 0.7rem;
+  border-radius: 999px; font-size: 0.68rem; font-weight: 700; letter-spacing: 0.08em;
+}
+.insignia-pendiente { background: var(--pns-color-acento-fondo); color: var(--pns-color-acento); }
+.insignia-exito { background: rgba(188, 255, 98, 0.15); color: var(--pns-color-primario); }
+.auth-cabecera {
+  text-align: center; margin-bottom: 1.4rem;
+  h1 { font-size: 1.7rem; font-weight: 700; margin: 0 0 0.45rem; color: var(--pns-color-texto); }
+  .subtitulo { margin: 0; font-size: 0.87rem; color: var(--pns-color-texto-suave); line-height: 1.55; }
+}
+.correo-destino { color: var(--pns-color-texto); }
+.pasos-caja {
+  display: flex; flex-direction: column; gap: 0.8rem; padding: 1rem 1.1rem;
+  margin-bottom: 1.35rem; border-radius: 12px; background: #13141c; border: 1px solid var(--pns-color-borde);
+}
+.paso-item {
+  display: flex; align-items: flex-start; gap: 0.75rem;
+  .paso-numero {
+    width: 24px; height: 24px; flex-shrink: 0; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--pns-color-acento-fondo); color: var(--pns-color-acento); font-size: 0.75rem; font-weight: 700;
+  }
+  strong { display: block; font-size: 0.84rem; color: var(--pns-color-texto); }
+  p { margin: 0.15rem 0 0; font-size: 0.76rem; color: var(--pns-color-texto-suave); }
+}
+.resumen-verificado {
+  display: flex; align-items: flex-start; gap: 0.85rem; padding: 1rem 1.15rem; margin-bottom: 1.35rem;
+  border-radius: 12px; background: rgba(188, 255, 98, 0.08); border: 1px solid rgba(188, 255, 98, 0.3);
+  i { color: var(--pns-color-primario); font-size: 1.35rem; }
+  strong { display: block; font-size: 0.88rem; color: var(--pns-color-texto); }
+  p { margin: 0.2rem 0 0; font-size: 0.78rem; color: var(--pns-color-texto-suave); }
+}
+.boton-submit {
+  width: 100%; padding: 0.78rem 1rem; border: 0; border-radius: 10px;
+  background: linear-gradient(135deg, #635bff, #7c6cff); color: #fff; font-size: 0.9rem; font-weight: 700;
+  cursor: pointer; box-shadow: 0 8px 24px rgba(99, 91, 255, 0.35);
+}
+.boton-lima {
+  width: 100%; padding: 0.8rem 1rem; border: 0; border-radius: 10px;
+  background: var(--pns-color-primario); color: var(--pns-color-texto-primario); font-size: 0.92rem; font-weight: 700; cursor: pointer;
+}
+.acciones-secundarias { display: flex; flex-direction: column; gap: 0.65rem; margin-top: 1rem; }
+.boton-secundario {
+  width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.45rem;
+  padding: 0.65rem 1rem; border-radius: 10px; border: 1px solid var(--pns-color-borde);
+  background: #13141c; color: var(--pns-color-texto); font-size: 0.84rem; font-weight: 600; cursor: pointer;
+  &:hover { border-color: var(--pns-color-acento-fuerte); }
+}
+.boton-texto {
+  border: 0; background: transparent; color: var(--pns-color-texto-suave); font-size: 0.8rem; cursor: pointer;
+  &:hover { color: #ff8787; text-decoration: underline; }
+}
+.enlace-acento { color: var(--pns-color-acento); font-size: 0.84rem; text-decoration: none; }

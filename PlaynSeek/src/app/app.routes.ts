@@ -35,7 +35,6 @@ export const routes: Routes = [
   {
     path: '',
     component: PublicLayout,
-    canActivate: [authGuard],
     children: [
       { path: '', component: Landing, pathMatch: 'full' },
 
@@ -47,10 +46,11 @@ export const routes: Routes = [
 
 
   // PORTAL: lo que ve el usuario con sesión iniciada
-  // PortalLayout trae la navbar y el sidebar
+  // PortalLayout trae la navbar
   {
     path: '',
     component: PortalLayout,
+    canActivate: [authGuard],
     children: [
       { path: 'dashboard', component: Dashboard },
       // Cada sección monta su arreglo de rutas bajo un prefijo

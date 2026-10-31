@@ -1,1 +1,30 @@
-<p>user-card works!</p>
+<div class="card pns-tarjeta h-100">
+  <div class="card-body text-center">
+
+    @if (usuario.foto_perfil) {
+      <img [src]="usuario.foto_perfil" class="avatar mb-2" [alt]="usuario.nombre" />
+    } @else {
+      <div class="avatar sin-foto mb-2 mx-auto d-flex align-items-center justify-content-center">
+        {{ usuario.nombre.charAt(0) }}
+      </div>
+    }
+
+    <h6 class="card-title mb-1">{{ usuario.nombre }}</h6>
+
+    @if (usuario.rol !== 'usuario') {
+      <span class="badge text-bg-primary mb-2">{{ usuario.rol }}</span>
+    }
+
+    @if (usuario.idiomas?.length) {
+      <p class="text-muted small mb-2">{{ usuario.idiomas?.join(', ') }}</p>
+    }
+
+    @if (usuario.plataformas?.length) {
+      <div class="d-flex flex-wrap justify-content-center gap-1">
+        @for (plataforma of usuario.plataformas; track plataforma.nombre) {
+          <span class="badge" [appPlatformBadge]="plataforma.nombre">{{ plataforma.nombre }}</span>
+        }
+      </div>
+    }
+  </div>
+</div>
