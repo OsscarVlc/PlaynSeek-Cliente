@@ -593,3 +593,35 @@ textarea {
 .comentario-form {
   margin-top: 18px;
 }
+
+
+.estado-centro {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 60px 0;
+  color: #a7a8b8;
+
+  .spinner-border {
+    color: #a49aff;
+  }
+}
+
+.acciones-pertenencia {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+
+
+  a.boton-principal {
+    display: inline-block;
+    text-decoration: none;
+  }
+}
+
+.boton-secundario:disabled,
+.boton-peligro:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}

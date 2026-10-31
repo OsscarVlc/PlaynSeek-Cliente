@@ -74,6 +74,31 @@ export class GrupoApi {
     return this.http.delete<RespuestaMensaje>(this.url + '/' + id);
   }
 
+
+  // POST /grupo/:id/unirse  (requiere token)
+  unirse(id: string): Observable<RespuestaMensaje> {
+    return this.http.post<RespuestaMensaje>(this.url + '/' + id + '/unirse', {});
+  }
+
+  // POST /grupo/:id/salir  (requiere token; el líder no puede salir)
+  salir(id: string): Observable<RespuestaMensaje> {
+    return this.http.post<RespuestaMensaje>(this.url + '/' + id + '/salir', {});
+  }
+
+  // DELETE /grupo/:id/integrantes con { usuarioId }  
+  expulsar(id: string, usuarioId: string): Observable<RespuestaMensaje> {
+    return this.http.delete<RespuestaMensaje>(this.url + '/' + id + '/integrantes', {
+      body: { usuarioId: usuarioId },
+    });
+  }
+
+  // PATCH /grupo/:id/transferir-liderazgo con { nuevoLiderId }  (solo el lider)
+  transferirLiderazgo(id: string, nuevoLiderId: string): Observable<RespuestaMensaje> {
+    return this.http.patch<RespuestaMensaje>(this.url + '/' + id + '/transferir-liderazgo', {
+      nuevoLiderId: nuevoLiderId,
+    });
+  }
+
   // Arma el cuerpo con SOLO nombre y descripcion
   private cuerpo(datos: DatosGrupo): DatosGrupo {
     return {
