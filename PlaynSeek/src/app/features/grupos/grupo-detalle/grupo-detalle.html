@@ -1,56 +1,71 @@
 <section class="detalle-page">
   <a routerLink="/grupos" class="volver">← Volver a grupos</a>
 
-  @if (grupo(); as grupoActual) {
-    <header
-      class="portada"
-      [class.portada-verde]="grupoActual.tono === 'verde'"
-      [class.portada-rosa]="grupoActual.tono === 'rosa'"
-    >
-      @if (grupoActual.imagen) {
-        <img class="portada-imagen" [src]="grupoActual.imagen" alt="" />
-      }
+  <!-- ESTADO: cargando -->
+  @if (cargando()) {
+    <div class="estado-centro" role="status">
+      <div class="spinner-border" aria-hidden="true"></div>
+      <p>Cargando grupo...</p>
+    </div>
+  }
 
+  <!-- ESTADO: no encontrado -->
+  @else if (noEncontrado()) {
+    <div class="estado-vacio">
+      <h1>No encontramos este grupo</h1>
+      <p>Puede que el enlace no exista o que el grupo haya sido eliminado.</p>
+      <a routerLink="/grupos" class="enlace">Explorar grupos</a>
+    </div>
+  }
+
+  <!-- ESTADO: error -->
+  @else if (error()) {
+    <div class="estado-vacio">
+      <h1>No pudimos cargar el grupo</h1>
+      <p>Revisa tu conexión e inténtalo de nuevo.</p>
+      <button type="button" class="boton-principal" (click)="cargar()">Reintentar</button>
+    </div>
+  }
+
+  <!-- ESTADO: con datos -->
+  @else if (grupo(); as grupoActual) {
+    <header class="portada">
       <div class="portada-contenido">
-        <span class="etiqueta">{{ grupoActual.juego }}</span>
+        <span class="etiqueta">Creado el {{ formatearFecha(grupoActual.fecha_creacion) }}</span>
         <h1>{{ grupoActual.nombre }}</h1>
-        <p class="descripcion">{{ grupoActual.descripcion }}</p>
+        <p class="descripcion">{{ grupoActual.descripcion || 'Este grupo aún no tiene descripción.' }}</p>
 
         <div class="datos-grupo">
-          <span>{{ grupoActual.integrantes.length }} integrantes</span>
+          <span>{{ totalIntegrantes() }} {{ totalIntegrantes() === 1 ? 'integrante' : 'integrantes' }}</span>
 
-          @if (esIntegrante()) {
+          @if (esLider()) {
+            <span class="miembro">● Eres el líder</span>
+          } @else if (esIntegrante()) {
             <span class="miembro">● Eres integrante</span>
           }
         </div>
 
         <div class="acciones-pertenencia">
-            @if (esIntegrante()) {
-                <button type="button" class="boton-secundario" (click)="salir()">
-                Salir del grupo
-                </button>
-            } @else {
-                <button type="button" class="boton-principal" (click)="unirse()">
-                Unirme al grupo
-                </button>
-            }
+          @if (esLider()) {
+            <!-- Solo el líder puede editar y eliminar -->
+            <a class="boton-principal" [routerLink]="['/grupos', grupoActual._id, 'editar']">
+              Editar grupo
+            </a>
+            <button type="button" class="boton-peligro" [disabled]="procesando()" (click)="eliminar()">
+              Eliminar grupo
+            </button>
+          } @else if (esIntegrante()) {
+            <button type="button" class="boton-secundario" [disabled]="procesando()" (click)="salir()">
+              Salir del grupo
+            </button>
+          } @else {
+            <button type="button" class="boton-principal" [disabled]="procesando()" (click)="unirse()">
+              Unirme al grupo
+            </button>
+          }
         </div>
-
       </div>
     </header>
-
-    @if (aviso()) {
-        <div class="aviso" role="status">
-            <span>{{ aviso() }}</span>
-            <button
-            type="button"
-            aria-label="Cerrar aviso"
-            (click)="aviso.set('')"
-            >
-            ×
-            </button>
-        </div>
-        }
 
     <nav class="tabs" aria-label="Secciones del grupo">
       <button
@@ -78,7 +93,7 @@
         (click)="seleccionarTab('integrantes')"
       >
         Integrantes
-        <span>{{ grupoActual.integrantes.length }}</span>
+        <span>{{ totalIntegrantes() }}</span>
       </button>
     </nav>
 
@@ -89,9 +104,7 @@
             <form class="panel editor" (ngSubmit)="publicar(imagenPostInput)">
               <h2>Comparte con tu comunidad</h2>
 
-              <label class="campo-label" for="nuevo-post">
-                Nueva publicación
-              </label>
+              <label class="campo-label" for="nuevo-post">Nueva publicación</label>
 
               <textarea
                 id="nuevo-post"
@@ -103,45 +116,42 @@
               ></textarea>
 
               <div class="adjunto-post">
-                <label class="campo-label" for="imagen-post">
-                    Agregar imagen
-                </label>
+                <label class="campo-label" for="imagen-post">Agregar imagen</label>
 
                 <input
-                    #imagenPostInput
-                    id="imagen-post"
-                    type="file"
-                    accept="image/jpeg,image/png,image/webp"
-                    [disabled]="leyendoImagenPost()"
-                    (change)="seleccionarImagenPost($event)"
-                    aria-describedby="imagen-post-ayuda"
+                  #imagenPostInput
+                  id="imagen-post"
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  [disabled]="leyendoImagenPost()"
+                  (change)="seleccionarImagenPost($event)"
+                  aria-describedby="imagen-post-ayuda"
                 />
 
                 <small id="imagen-post-ayuda">JPG, PNG o WebP. Máximo 5 MB.</small>
 
                 @if (leyendoImagenPost()) {
-                    <p role="status">Preparando imagen…</p>
+                  <p role="status">Preparando imagen…</p>
                 }
 
                 @if (errorImagenPost()) {
-                    <p class="error-adjunto" role="alert">{{ errorImagenPost() }}</p>
+                  <p class="error-adjunto" role="alert">{{ errorImagenPost() }}</p>
                 }
 
                 @if (imagenPost(); as imagen) {
-                    <div class="preview-post">
+                  <div class="preview-post">
                     <img [src]="imagen" alt="Vista previa de la imagen que publicarás" />
-
                     <button
-                        type="button"
-                        class="boton-secundario"
-                        [disabled]="leyendoImagenPost()"
-                        (click)="quitarImagenPost(imagenPostInput)"
+                      type="button"
+                      class="boton-secundario"
+                      [disabled]="leyendoImagenPost()"
+                      (click)="quitarImagenPost(imagenPostInput)"
                     >
-                        Quitar imagen
+                      Quitar imagen
                     </button>
-                    </div>
+                  </div>
                 }
-                </div>
+              </div>
 
               <div class="editor-footer">
                 <small>Visible para los integrantes del grupo</small>
@@ -161,74 +171,67 @@
               @for (post of postsDelGrupo(); track post.id) {
                 <article class="panel publicacion">
                   <header class="autor">
-                    <span class="avatar" aria-hidden="true">SO</span>
+                    <span class="avatar" aria-hidden="true">{{ inicial(post.autor) }}</span>
                     <div>
                       <strong>{{ post.autor }}</strong>
                       <time [attr.datetime]="post.fecha.toISOString()">
-                        {{ post.fecha | date:'dd/MM/yyyy HH:mm' }}
+                        {{ post.fecha | date: 'dd/MM/yyyy HH:mm' }}
                       </time>
                     </div>
                   </header>
 
                   <p class="texto-publicado">{{ post.contenido }}</p>
-                  @if (post.imagen; as imagen) {
-                    <img
-                        class="imagen-publicada"
-                        [src]="imagen"
-                        [alt]="'Imagen publicada por ' + post.autor"
-                    />
-                    }
 
-                    <section
+                  @if (post.imagen; as imagen) {
+                    <img class="imagen-publicada" [src]="imagen" [alt]="'Imagen publicada por ' + post.autor" />
+                  }
+
+                  <section
                     class="comentarios-post"
                     [attr.aria-label]="'Comentarios de la publicación de ' + post.autor"
-                    >
+                  >
                     <h3>
-                        {{ post.comentarios.length }}
-                        {{ post.comentarios.length === 1 ? 'comentario' : 'comentarios' }}
+                      {{ post.comentarios.length }}
+                      {{ post.comentarios.length === 1 ? 'comentario' : 'comentarios' }}
                     </h3>
 
                     <div class="lista-comentarios">
-                        @for (comentario of post.comentarios; track comentario.id) {
+                      @for (comentario of post.comentarios; track comentario.id) {
                         <article class="comentario">
-                            <header>
+                          <header>
                             <strong>{{ comentario.autor }}</strong>
                             <time [attr.datetime]="comentario.fecha.toISOString()">
-                                {{ comentario.fecha | date:'dd/MM HH:mm' }}
+                              {{ comentario.fecha | date: 'dd/MM HH:mm' }}
                             </time>
-                            </header>
-
-                            <p>{{ comentario.contenido }}</p>
+                          </header>
+                          <p>{{ comentario.contenido }}</p>
                         </article>
-                        } @empty {
+                      } @empty {
                         <p class="sin-comentarios">Sé el primero en comentar.</p>
-                        }
+                      }
                     </div>
 
                     <form class="comentario-form" (ngSubmit)="comentar(post.id)">
-                        <label class="campo-label" [for]="'comentario-' + post.id">
-                        Tu comentario
-                        </label>
+                      <label class="campo-label" [for]="'comentario-' + post.id">Tu comentario</label>
 
-                        <div class="chat-input">
+                      <div class="chat-input">
                         <input
-                            [id]="'comentario-' + post.id"
-                            [name]="'comentario-' + post.id"
-                            [(ngModel)]="borradoresComentarios[post.id]"
-                            maxlength="500"
-                            placeholder="Escribe un comentario..."
+                          [id]="'comentario-' + post.id"
+                          [name]="'comentario-' + post.id"
+                          [(ngModel)]="borradoresComentarios[post.id]"
+                          maxlength="500"
+                          placeholder="Escribe un comentario..."
                         />
-
                         <button
-                            type="submit"
-                            class="boton-principal"
-                            [disabled]="!(borradoresComentarios[post.id] ?? '').trim()"
+                          type="submit"
+                          class="boton-principal"
+                          [disabled]="!(borradoresComentarios[post.id] ?? '').trim()"
                         >
-                            Comentar
+                          Comentar
                         </button>
-                        </div>
+                      </div>
                     </form>
-                    </section>
+                  </section>
                 </article>
               } @empty {
                 <div class="estado-vacio">
@@ -262,14 +265,11 @@
               aria-relevant="additions"
             >
               @for (mensaje of mensajesDelGrupo(); track mensaje.id) {
-                <article
-                  class="mensaje"
-                  [class.propio]="mensaje.autorId === usuarioActualId"
-                >
+                <article class="mensaje" [class.propio]="mensaje.autorId === usuarioActualId">
                   <strong>{{ mensaje.autor }}</strong>
                   <p>{{ mensaje.contenido }}</p>
                   <time [attr.datetime]="mensaje.fecha.toISOString()">
-                    {{ mensaje.fecha | date:'HH:mm' }}
+                    {{ mensaje.fecha | date: 'HH:mm' }}
                   </time>
                 </article>
               } @empty {
@@ -292,12 +292,7 @@
                   placeholder="Escribe un mensaje..."
                   autocomplete="off"
                 />
-
-                <button
-                  type="submit"
-                  class="boton-principal"
-                  [disabled]="!nuevoMensaje.trim()"
-                >
+                <button type="submit" class="boton-principal" [disabled]="!nuevoMensaje.trim()">
                   Enviar
                 </button>
               </div>
@@ -312,144 +307,111 @@
 
       @case ('integrantes') {
         <section class="panel" aria-labelledby="titulo-integrantes">
-            <h2 id="titulo-integrantes">Conoce a tu equipo</h2>
+          <h2 id="titulo-integrantes">Conoce a tu equipo</h2>
 
-            @if (confirmacion(); as pendiente) {
+          @if (confirmacion(); as pendiente) {
             <div class="confirmacion">
-                <p>
+              <p>
                 @if (pendiente.accion === 'transferir') {
-                    ¿Quieres transferir el liderazgo a
-                    <strong>{{ pendiente.nombre }}</strong>?
-                    Dejarás de tener los permisos de líder.
+                  ¿Quieres transferir el liderazgo a <strong>{{ pendiente.nombre }}</strong>?
+                  Dejarás de tener los permisos de líder.
                 } @else {
-                    ¿Quieres retirar del grupo a
-                    <strong>{{ pendiente.nombre }}</strong>?
+                  ¿Quieres retirar del grupo a <strong>{{ pendiente.nombre }}</strong>?
                 }
-                </p>
+              </p>
 
-                <div class="acciones-integrante">
+              <div class="acciones-integrante">
                 <button
-                    type="button"
-                    class="boton-principal"
-                    (click)="confirmarAccion()"
+                  type="button"
+                  class="boton-principal"
+                  [disabled]="procesando()"
+                  (click)="confirmarAccion()"
                 >
-                    Confirmar
+                  Confirmar
                 </button>
-
-                <button
-                    type="button"
-                    class="boton-secundario"
-                    (click)="confirmacion.set(null)"
-                >
-                    Cancelar
+                <button type="button" class="boton-secundario" (click)="confirmacion.set(null)">
+                  Cancelar
                 </button>
-                </div>
+              </div>
             </div>
-            }
+          }
 
-            @if (usuarioReportado(); as reportado) {
+          @if (usuarioReportado(); as reportado) {
             <form class="reporte-form" (ngSubmit)="enviarReporte()">
-                <h3>Reportar a {{ reportado.nombre }}</h3>
+              <h3>Reportar a {{ reportado.nombre }}</h3>
 
-                <label class="campo-label" for="motivo-reporte">
-                Describe el motivo
-                </label>
+              <label class="campo-label" for="motivo-reporte">Describe el motivo</label>
 
-                <textarea
+              <textarea
                 id="motivo-reporte"
                 name="motivoReporte"
                 [(ngModel)]="motivoReporte"
                 rows="3"
                 maxlength="500"
                 required
-                ></textarea>
+              ></textarea>
 
-                <div class="acciones-integrante">
-                <button
-                    type="submit"
-                    class="boton-principal"
-                    [disabled]="!motivoReporte.trim()"
-                >
-                    Simular reporte
+              <div class="acciones-integrante">
+                <button type="submit" class="boton-principal" [disabled]="!motivoReporte.trim()">
+                  Simular reporte
                 </button>
-
-                <button
-                    type="button"
-                    class="boton-secundario"
-                    (click)="usuarioReportado.set(null)"
-                >
-                    Cancelar
+                <button type="button" class="boton-secundario" (click)="usuarioReportado.set(null)">
+                  Cancelar
                 </button>
-                </div>
+              </div>
             </form>
-            }
+          }
 
-            <ul class="lista-integrantes">
-            @for (integrante of grupoActual.integrantes; track integrante.id) {
-                <li>
+          <ul class="lista-integrantes">
+            @for (integranteId of grupoActual.integrantes ?? []; track integranteId) {
+              <li>
                 <div class="autor">
-                    <span class="avatar" aria-hidden="true">
-                    {{ integrante.iniciales }}
-                    </span>
+                  <span class="avatar" aria-hidden="true">
+                    {{ inicial(nombreIntegrante(integranteId)) }}
+                  </span>
 
-                    <div>
-                    <strong>{{ integrante.nombre }}</strong>
+                  <div>
+                    <strong>{{ nombreIntegrante(integranteId) }}</strong>
 
                     <div class="insignias">
-                        @if (integrante.id === grupoActual.liderId) {
+                      @if (integranteId === grupoActual.lider_id) {
                         <span class="etiqueta-lider">Líder</span>
-                        }
-
-                        @if (integrante.id === usuarioActualId) {
+                      }
+                      @if (integranteId === usuarioActualId) {
                         <span class="etiqueta-tu">Tú</span>
-                        }
+                      }
                     </div>
-                    </div>
+                  </div>
                 </div>
 
-                @if (integrante.id !== usuarioActualId) {
-                    <div class="acciones-integrante">
+                @if (integranteId !== usuarioActualId) {
+                  <div class="acciones-integrante">
                     @if (esLider()) {
-                        <button
+                      <button
                         type="button"
                         class="boton-secundario"
-                        (click)="pedirConfirmacion('transferir', integrante)"
-                        >
+                        (click)="pedirConfirmacion('transferir', integranteId)"
+                      >
                         Hacer líder
-                        </button>
-
-                        <button
+                      </button>
+                      <button
                         type="button"
                         class="boton-peligro"
-                        (click)="pedirConfirmacion('expulsar', integrante)"
-                        >
+                        (click)="pedirConfirmacion('expulsar', integranteId)"
+                      >
                         Expulsar
-                        </button>
+                      </button>
                     }
-
-                    <button
-                        type="button"
-                        class="boton-secundario"
-                        (click)="abrirReporte(integrante)"
-                    >
-                        Reportar
+                    <button type="button" class="boton-secundario" (click)="abrirReporte(integranteId)">
+                      Reportar
                     </button>
-                    </div>
+                  </div>
                 }
-                </li>
+              </li>
             }
-            </ul>
+          </ul>
         </section>
       }
     }
-  } @else {
-    <div class="estado-vacio">
-      <h1>No encontramos este grupo</h1>
-      <p>
-        Puede que el enlace no exista o que el grupo de prueba se haya perdido
-        al recargar la aplicación.
-      </p>
-      <a routerLink="/grupos" class="enlace">Explorar grupos</a>
-    </div>
   }
 </section>

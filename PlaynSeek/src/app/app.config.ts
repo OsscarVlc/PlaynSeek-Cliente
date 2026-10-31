@@ -14,6 +14,6 @@ export const appConfig: ApplicationConfig = {
     // primero el token modifica la peticion que sale, y el de errores atrapa lo que regrese del back.
     provideHttpClient(withInterceptors([tokenInterceptor, errorInterceptor])),
     // Antes de mostrar nada, recupera la sesión si hay un token guardado
-    //provideAppInitializer(() => inject(Auth).recuperarSesion()),
+    provideAppInitializer(() => inject(Auth).recuperarSesion()),
   ],
 };

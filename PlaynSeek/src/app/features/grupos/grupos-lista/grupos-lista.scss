@@ -155,8 +155,15 @@ input {
 
 .grupos-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
-  gap: 22px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+}
+
+// En pantallas angostas, una tarjeta por fila
+@media (max-width: 700px) {
+  .grupos-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .grupo-card {
@@ -338,5 +345,77 @@ input {
 
   .crear-grupo {
     width: 100%;
+  }
+}
+
+
+
+
+
+
+
+// ---------- Búsqueda con botón ----------
+.buscador-fila {
+  display: flex;
+  gap: 0.5rem;
+
+  input {
+    flex: 1;
+  }
+}
+
+.boton-buscar {
+  background-color: var(--pns-color-primario);
+  border: 0;
+  border-radius: 10px;
+  color: var(--pns-color-texto-primario);
+  font-weight: 600;
+  padding: 0 1rem;
+}
+
+// ---------- Estado de carga ----------
+.estado-centro {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 3rem 0;
+  color: var(--pns-color-texto-suave);
+
+  .spinner-border {
+    color: var(--pns-color-acento);
+  }
+}
+
+// ---------- Fecha en el pie de la tarjeta ----------
+.fecha {
+  color: var(--pns-color-texto-suave);
+  font-size: 0.78rem;
+}
+
+// ---------- Paginación ----------
+.paginacion {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 2rem;
+  color: var(--pns-color-texto-suave);
+
+  button {
+    background-color: var(--pns-color-tarjeta);
+    border: 1px solid var(--pns-color-borde);
+    border-radius: 8px;
+    color: var(--pns-color-texto);
+    padding: 0.4rem 0.9rem;
+
+    &:hover:not(:disabled) {
+      border-color: var(--pns-color-acento-fuerte);
+    }
+
+    &:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
   }
 }
