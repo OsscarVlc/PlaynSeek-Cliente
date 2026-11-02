@@ -1,128 +1,178 @@
-<section class="form-page" aria-labelledby="titulo-crear">
-  <a routerLink="/grupos" class="volver">← Volver a grupos</a>
+<section class="form-page" aria-labelledby="titulo-formulario">
+  <a [routerLink]="esEdicion() ? ['/grupos', id()] : '/grupos'" class="volver">
+    ← Volver a {{ esEdicion() ? 'detalle de grupo' : 'grupos' }}
+  </a>
 
   <header>
-    <p class="eyebrow">TU COMUNIDAD EMPIEZA AQUÍ</p>
-    <h1 id="titulo-crear">Crea tu próximo equipo.</h1>
+    <p class="eyebrow">
+      {{ esEdicion() ? 'ADMINISTRACIÓN DE COMUNIDAD' : 'TU COMUNIDAD EMPIEZA AQUÍ' }}
+    </p>
+    <h1 id="titulo-formulario">
+      {{ esEdicion() ? 'Edita tu grupo.' : 'Crea tu próximo equipo.' }}
+    </h1>
     <p class="subtitulo">
-      Dale un nombre, comparte la idea e invita a otros a jugar.
+      {{
+        esEdicion()
+          ? 'Actualiza los datos para tus miembros y nuevos jugadores.'
+          : 'Dale un nombre, comparte la idea e invita a otros a jugar.'
+      }}
     </p>
   </header>
 
-  <form [formGroup]="formulario" (ngSubmit)="guardar()">
-    <div class="form-grid">
-      <div class="campos">
-        <div class="campo">
-          <label for="nombre">Nombre del grupo <span>*</span></label>
-
-          <input
-            id="nombre"
-            type="text"
-            formControlName="nombre"
-            maxlength="60"
-            placeholder="Ej. Valorant Nocturno"
-            aria-describedby="nombre-ayuda"
-            [attr.aria-invalid]="
-              formulario.controls.nombre.touched &&
-              formulario.controls.nombre.invalid
-            "
-          />
-
-          <small id="nombre-ayuda">
-            Un nombre que identifique a tu comunidad. Máximo 60 caracteres.
-          </small>
-
-          @if (
-            formulario.controls.nombre.touched &&
-            formulario.controls.nombre.invalid
-          ) {
-            <p class="error" role="alert">
-              Escribe un nombre válido; no puede contener solo espacios.
-            </p>
-          }
-        </div>
-
-        <div class="campo">
-          <label for="descripcion">Descripción</label>
-
-          <textarea
-            id="descripcion"
-            formControlName="descripcion"
-            rows="6"
-            maxlength="500"
-            placeholder="¿Qué juegan? ¿Qué tipo de compañeros buscan?"
-            aria-describedby="descripcion-ayuda"
-          ></textarea>
-
-          <small id="descripcion-ayuda">
-            {{ formulario.controls.descripcion.value.length }} / 500 caracteres
-          </small>
-        </div>
-
-        <p class="nota">
-          Al crear el grupo, formarás parte de sus integrantes.
-          Los datos de esta demostración se guardan durante la sesión de la app.
-        </p>
-      </div>
-
-      <div class="imagen-campo">
-        <label for="imagen-grupo">Imagen del grupo</label>
-
-        <div class="preview">
-          @if (imagenPreview(); as imagen) {
-            <img [src]="imagen" alt="Vista previa de la portada del grupo" />
-          } @else {
-            <div class="placeholder-imagen">
-              <span aria-hidden="true">+</span>
-              <strong>Dale identidad a tu grupo</strong>
-              <p>Elige una imagen para su portada</p>
-            </div>
-          }
-        </div>
-
-        <input
-          #imagenInput
-          id="imagen-grupo"
-          type="file"
-          accept="image/jpeg,image/png,image/webp"
-          [disabled]="leyendoImagen()"
-          (change)="seleccionarImagen($event)"
-          aria-describedby="imagen-ayuda"
-        />
-
-        <small id="imagen-ayuda">JPG, PNG o WebP. Máximo 5 MB.</small>
-
-        @if (leyendoImagen()) {
-          <p role="status">Preparando vista previa…</p>
-        }
-
-        @if (errorImagen()) {
-          <p class="error" role="alert">{{ errorImagen() }}</p>
-        }
-
-        @if (imagenPreview()) {
-          <button
-            type="button"
-            class="quitar-imagen"
-            [disabled]="leyendoImagen()"
-            (click)="quitarImagen(imagenInput)"
-          >
-            Quitar imagen
-          </button>
-        }
+  @if (cargando()) {
+    <div class="estado-cargando" role="status">
+      <div class="spinner-border" aria-hidden="true"></div>
+      <p>Cargando información del grupo…</p>
+    </div>
+  } @else if (errorCarga()) {
+    <div class="alerta-error" role="alert">
+      <h2>No pudimos cargar el grupo</h2>
+      <p>{{ errorCarga() }}</p>
+      <div class="acciones-alerta">
+        <button type="button" class="btn-reintentar" (click)="cargarGrupo(id()!)">
+          Reintentar
+        </button>
+        <a routerLink="/grupos" class="btn-cancelar">Volver a grupos</a>
       </div>
     </div>
+  } @else {
+    @if (esEdicion() && !esLider()) {
+      <div class="alerta-aviso" role="alert">
+        <strong>Modo de solo lectura:</strong> Solo el líder de este grupo tiene permisos para editar sus datos.
+      </div>
+    }
 
-    <footer class="acciones">
-      <a routerLink="/grupos" class="cancelar">Cancelar</a>
+    @if (errorEnvio()) {
+      <div class="alerta-error" role="alert">
+        <p>{{ errorEnvio() }}</p>
+      </div>
+    }
 
-      <button
-        type="submit"
-        class="guardar"
-        [disabled]="leyendoImagen()"
-      >
-        Crear grupo
-      </button>
-    </footer>
-  </form>
+    <form [formGroup]="formulario" (ngSubmit)="guardar()">
+      <div class="form-grid">
+        <div class="campos">
+          <div class="campo">
+            <label for="nombre">Nombre del grupo <span aria-hidden="true">*</span></label>
+
+            <input
+              id="nombre"
+              type="text"
+              formControlName="nombre"
+              maxlength="50"
+              placeholder="Ej. Valorant Nocturno"
+              aria-describedby="nombre-ayuda"
+              [attr.aria-invalid]="
+                formulario.controls.nombre.touched &&
+                formulario.controls.nombre.invalid
+              "
+            />
+
+            <small id="nombre-ayuda">
+              Entre 3 y 50 caracteres. No puede consistir solo de espacios.
+            </small>
+
+            @if (formulario.controls.nombre.touched && formulario.controls.nombre.invalid) {
+              @if (formulario.controls.nombre.errors?.['required']) {
+                <p class="error" role="alert">El nombre del grupo es obligatorio.</p>
+              } @else if (formulario.controls.nombre.errors?.['minlength']) {
+                <p class="error" role="alert">El nombre debe tener al menos 3 caracteres.</p>
+              } @else if (formulario.controls.nombre.errors?.['maxlength']) {
+                <p class="error" role="alert">El nombre no puede exceder 50 caracteres.</p>
+              } @else if (formulario.controls.nombre.errors?.['soloEspacios']) {
+                <p class="error" role="alert">El nombre no puede contener únicamente espacios en blanco.</p>
+              }
+            }
+          </div>
+
+          <div class="campo">
+            <label for="descripcion">Descripción</label>
+
+            <textarea
+              id="descripcion"
+              formControlName="descripcion"
+              rows="5"
+              maxlength="200"
+              placeholder="¿Qué juegan? ¿Qué tipo de compañeros buscan?..."
+              aria-describedby="descripcion-ayuda"
+            ></textarea>
+
+            <small id="descripcion-ayuda">
+              {{ formulario.controls.descripcion.value.length }} / 200 caracteres
+            </small>
+
+            @if (formulario.controls.descripcion.touched && formulario.controls.descripcion.errors?.['maxlength']) {
+              <p class="error" role="alert">La descripción no puede exceder 200 caracteres.</p>
+            }
+          </div>
+
+          <p class="nota">
+            {{
+              esEdicion()
+                ? 'Los cambios se guardan directamente en el servidor y serán visibles para toda la comunidad.'
+                : 'Al crear el grupo te convertirás en el líder y administrador de la comunidad.'
+            }}
+          </p>
+        </div>
+
+        <aside class="vista-previa" aria-label="Vista previa de la tarjeta del grupo">
+          <label class="etiqueta-previa">Vista previa en catálogo</label>
+
+          <article class="grupo-card">
+            <div class="portada">
+              <span class="simbolo" aria-hidden="true">
+                {{ inicialNombre() }}
+              </span>
+              <span class="juego">Comunidad</span>
+            </div>
+
+            <div class="card-contenido">
+              <h2>{{ formulario.controls.nombre.value.trim() || 'Nombre de tu comunidad' }}</h2>
+
+              <p class="integrantes-total">
+                @if (esEdicion()) {
+                  {{ grupoExistente()?.integrantes?.length ?? 1 }}
+                  {{ (grupoExistente()?.integrantes?.length ?? 1) === 1 ? 'integrante' : 'integrantes' }}
+                } @else {
+                  1 integrante (Tú como líder)
+                }
+              </p>
+
+              <p class="descripcion-preview">
+                {{
+                  formulario.controls.descripcion.value.trim() ||
+                  'Aquí aparecerá la descripción de tu comunidad cuando otros jugadores la exploren en el catálogo.'
+                }}
+              </p>
+
+              <footer class="card-footer-preview">
+                <span class="fecha-preview">
+                  {{ esEdicion() ? 'Modo edición' : 'Nueva comunidad' }}
+                </span>
+                <span class="badge-rol">Líder</span>
+              </footer>
+            </div>
+          </article>
+        </aside>
+      </div>
+
+      <footer class="acciones">
+        <a [routerLink]="esEdicion() ? ['/grupos', id()] : '/grupos'" class="cancelar">
+          Cancelar
+        </a>
+
+        <button
+          type="submit"
+          class="guardar"
+          [disabled]="guardando() || (esEdicion() && !esLider())"
+        >
+          @if (guardando()) {
+            <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+            {{ esEdicion() ? 'Guardando cambios…' : 'Creando grupo…' }}
+          } @else {
+            {{ esEdicion() ? 'Guardar cambios' : 'Crear grupo' }}
+          }
+        </button>
+      </footer>
+    </form>
+  }
 </section>
