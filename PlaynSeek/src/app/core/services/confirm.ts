@@ -11,6 +11,7 @@ export interface ConfirmacionPendiente {
   titulo: string;
   mensaje: string;
   alConfirmar: () => void;
+  alCancelar?: () => void;
 }
 
 @Injectable({
@@ -32,6 +33,19 @@ export class Confirm {
     });
   }
 
+  // Versión que devuelve una Promesa con true si el usuario confirma o false si cancela.
+  // Ideal para guards de navegación como canDeactivate.
+  pedirAsync(mensaje: string, titulo: string = 'Confirmar acción'): Promise<boolean> {
+    return new Promise<boolean>((resolve) => {
+      this.pendiente.set({
+        titulo: titulo,
+        mensaje: mensaje,
+        alConfirmar: () => resolve(true),
+        alCancelar: () => resolve(false),
+      });
+    });
+  }
+
   // El usuario presionó "Sí": ejecutamos la función que nos dio la
   // pantalla y cerramos el modal.
   aceptar(): void {
@@ -42,8 +56,12 @@ export class Confirm {
     this.pendiente.set(null);
   }
 
-  // El usuario presionó "No": solo cerramos el modal, sin ejecutar nada.
+  // El usuario presionó "No": ejecutamos alCancelar si existe y cerramos el modal.
   cancelar(): void {
+    const actual = this.pendiente();
+    if (actual !== null && actual.alCancelar) {
+      actual.alCancelar();
+    }
     this.pendiente.set(null);
   }
 }

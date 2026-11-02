@@ -42,6 +42,79 @@ h1 {
   line-height: 1.7;
 }
 
+.estado-cargando {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  min-height: 300px;
+  color: #b4b5c4;
+}
+
+.alerta-error {
+  margin-bottom: 24px;
+  padding: 20px;
+  border: 1px solid #6e262f;
+  border-radius: 12px;
+  background: #2d1519;
+  color: #ffabab;
+
+  h2 {
+    margin: 0 0 8px;
+    font-size: 1.15rem;
+  }
+
+  p {
+    margin: 0;
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+}
+
+.acciones-alerta {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.btn-reintentar {
+  padding: 8px 16px;
+  border: 0;
+  border-radius: 8px;
+  background: #bcff62;
+  color: #17200f;
+  font-weight: 600;
+  cursor: pointer;
+
+  &:hover {
+    background: #ceff91;
+  }
+}
+
+.btn-cancelar {
+  padding: 8px 16px;
+  border: 1px solid #414256;
+  border-radius: 8px;
+  color: #dddde9;
+  text-decoration: none;
+
+  &:hover {
+    background: #262736;
+  }
+}
+
+.alerta-aviso {
+  margin-bottom: 24px;
+  padding: 16px 20px;
+  border: 1px solid #6e5926;
+  border-radius: 12px;
+  background: #2d2415;
+  color: #ffe8ab;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
 form {
   padding: clamp(18px, 3vw, 32px);
   border: 1px solid #303140;
@@ -51,20 +124,16 @@ form {
 
 .form-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
   gap: 32px;
 }
 
-.campo,
-.imagen-campo {
+.campo {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  min-width: 0;
-}
-
-.campo {
+  gap: 8px;
   margin-bottom: 24px;
+  min-width: 0;
 }
 
 label {
@@ -94,11 +163,16 @@ textarea {
   &::placeholder {
     color: #9193a6;
   }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
 }
 
 textarea {
   resize: vertical;
-  min-height: 140px;
+  min-height: 130px;
 }
 
 small,
@@ -112,75 +186,117 @@ small,
   margin: 0;
 }
 
-.preview {
-  display: grid;
-  place-items: center;
-  overflow: hidden;
-  aspect-ratio: 16 / 10;
-  border: 1px dashed #756497;
-  border-radius: 12px;
-  background: linear-gradient(135deg, #35294b, #1b2330);
-
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-}
-
-.placeholder-imagen {
-  padding: 20px;
-  text-align: center;
-
-  span {
-    display: block;
-    margin-bottom: 12px;
-    color: #bcff62;
-    font-size: 2rem;
-  }
-
-  strong {
-    display: block;
-    font-size: 0.95rem;
-  }
-
-  p {
-    margin: 8px 0 0;
-    color: #b4b5c4;
-    font-size: 0.8rem;
-  }
-}
-
-input[type='file'] {
-  width: 100%;
-  color: #b4b5c4;
-  font-size: 0.8rem;
-
-  &::file-selector-button {
-    margin-right: 10px;
-    padding: 9px 12px;
-    border: 1px solid #756497;
-    border-radius: 8px;
-    background: #30294e;
-    color: #eee9ff;
-    cursor: pointer;
-  }
-}
-
 .error {
   margin: 0;
   color: #ffabab;
   font-size: 0.8rem;
 }
 
-.quitar-imagen {
-  align-self: flex-start;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  color: #ffabab;
-  text-decoration: underline;
-  cursor: pointer;
+.vista-previa {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.etiqueta-previa {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #b4b5c4;
+}
+
+.grupo-card {
+  overflow: hidden;
+  border: 1px solid #303140;
+  border-radius: 16px;
+  background: #11121a;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
+}
+
+.portada {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 110px;
+  padding: 20px;
+  background: linear-gradient(120deg, #40335f, #202333);
+}
+
+.simbolo {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 12px;
+  color: #fff;
+  font-size: 1.35rem;
+  font-weight: 700;
+}
+
+.juego {
+  padding: 4px 8px;
+  border-radius: 6px;
+  background: #101116aa;
+  color: #f0edf8;
+  font-size: 0.65rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.card-contenido {
+  padding: 20px;
+
+  h2 {
+    margin: 0 0 6px;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #f4f4f8;
+    word-break: break-word;
+  }
+}
+
+.integrantes-total {
+  margin: 0 0 10px;
+  color: #a49aff;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.descripcion-preview {
+  margin: 0;
+  color: #a7a8b8;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  word-break: break-word;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.card-footer-preview {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid #252636;
+}
+
+.fecha-preview {
+  color: #7b7c8e;
+  font-size: 0.75rem;
+}
+
+.badge-rol {
+  padding: 3px 8px;
+  border: 1px solid rgba(188, 255, 98, 0.35);
+  border-radius: 6px;
+  background: rgba(188, 255, 98, 0.12);
+  color: #bcff62;
+  font-size: 0.72rem;
+  font-weight: 600;
 }
 
 .acciones {
@@ -217,14 +333,14 @@ input[type='file'] {
   color: #17200f;
   cursor: pointer;
 
-  &:hover {
+  &:hover:not(:disabled) {
     background: #ceff91;
   }
 }
 
 button:disabled {
   opacity: 0.6;
-  cursor: wait;
+  cursor: not-allowed;
 }
 
 a,
