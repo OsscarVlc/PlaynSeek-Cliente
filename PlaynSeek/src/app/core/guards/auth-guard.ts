@@ -9,9 +9,10 @@ import { CanActivateFn, Router } from '@angular/router';
 
 import { Auth } from '@core/services/auth';
 
-// CanActivateFn es el tipo de una función guard
-// Angular la llama cada vez que alguien intenta entrar a una ruta que la use
-export const authGuard: CanActivateFn = () => {
+// route es la ruta que se está evaluando
+// state es el estado completo de la navegación
+// state.url es la URL a la que el usuario intenta entrar
+export const authGuard: CanActivateFn = (route, state) => {
 
   //Se usa   inject() pirque un guard es una funcion no una clase y por eos no se usa constructor.
   const auth = inject(Auth);
@@ -22,7 +23,10 @@ export const authGuard: CanActivateFn = () => {
     return true;
   }
 
-  // Si no, devolvemos redirección a /login
-  // createUrlTree arma esa URL de destino.
-  return router.createUrlTree(['/login']);
+  // /login?returnUrl=/grupos/123
+  // Si no hay sesion devolvemos un UrlTree que redirige al login y le pasa la ruta a la que intentaba entrar
+  return router.createUrlTree(['/login'], {
+    queryParams: { returnUrl: state.url }, 
+  });
+  
 };

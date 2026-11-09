@@ -10,16 +10,10 @@
     <div class="auth-tarjeta pns-tarjeta">
       <header class="auth-cabecera">
         <h1 id="titulo-login">Bienvenido de nuevo</h1>
-        <p class="subtitulo">
-          Inicia sesión para armar squad con jugadores compatibles
-        </p>
+        <p class="subtitulo">Inicia sesión para armar squad con jugadores compatibles</p>
       </header>
 
-      <button
-        type="button"
-        class="boton-google"
-        (click)="iniciarConGoogle()"
-      >
+      <button type="button" class="boton-google" (click)="iniciarConGoogle()">
         <i class="bi bi-google" aria-hidden="true"></i>
         <span>Continuar con Google</span>
       </button>
@@ -28,15 +22,27 @@
         <span>O CONTINÚA CON TU CORREO</span>
       </div>
 
+      @if (errorLogin()) {
+        <div class="mensaje-error error-general" role="alert">
+          <i class="bi bi-exclamation-circle" aria-hidden="true"></i>
+          <span>{{ errorLogin() }}</span>
+          <button
+            type="button"
+            class="cerrar-error"
+            aria-label="Cerrar mensaje"
+            (click)="errorLogin.set('')"
+          >
+            <i class="bi bi-x-lg" aria-hidden="true"></i>
+          </button>
+        </div>
+      }
+
       <form [formGroup]="formulario" (ngSubmit)="ingresar()" novalidate>
         <div class="campo">
           <label for="correo-login">Correo electrónico</label>
           <div
             class="input-icono"
-            [class.invalido]="
-              formulario.controls.correo.touched &&
-              formulario.controls.correo.invalid
-            "
+            [class.invalido]="formulario.controls.correo.touched && formulario.controls.correo.invalid"
           >
             <i class="bi bi-envelope icono-izquierdo" aria-hidden="true"></i>
             <input
@@ -47,13 +53,10 @@
               autocomplete="email"
             />
           </div>
-          @if (
-            formulario.controls.correo.touched &&
-            formulario.controls.correo.invalid
-          ) {
-            <p class="mensaje-error" role="alert">
-              Ingresa una dirección de correo electrónico válida.
-            </p>
+          @if (formulario.controls.correo.touched && formulario.controls.correo.hasError('required')) {
+            <p class="mensaje-error" role="alert">El correo es obligatorio.</p>
+          } @else if (formulario.controls.correo.touched && formulario.controls.correo.hasError('email')) {
+            <p class="mensaje-error" role="alert">Ingresa un correo electrónico válido.</p>
           }
         </div>
 
@@ -61,10 +64,7 @@
           <label for="password-login">Contraseña</label>
           <div
             class="input-icono"
-            [class.invalido]="
-              formulario.controls.password.touched &&
-              formulario.controls.password.invalid
-            "
+            [class.invalido]="formulario.controls.password.touched && formulario.controls.password.invalid"
           >
             <i class="bi bi-lock icono-izquierdo" aria-hidden="true"></i>
             <input
@@ -78,11 +78,7 @@
               type="button"
               class="boton-ojo"
               (click)="alternarPassword()"
-              [attr.aria-label]="
-                mostrarPassword()
-                  ? 'Ocultar contraseña'
-                  : 'Mostrar contraseña'
-              "
+              [attr.aria-label]="mostrarPassword() ? 'Ocultar contraseña' : 'Mostrar contraseña'"
             >
               <i
                 class="bi"
@@ -92,53 +88,30 @@
               ></i>
             </button>
           </div>
-          @if (
-            formulario.controls.password.touched &&
-            formulario.controls.password.invalid
-          ) {
-            <p class="mensaje-error" role="alert">
-              La contraseña debe tener al menos 6 caracteres.
-            </p>
+          @if (formulario.controls.password.touched && formulario.controls.password.hasError('required')) {
+            <p class="mensaje-error" role="alert">La contraseña es obligatoria.</p>
+          } @else if (formulario.controls.password.touched && formulario.controls.password.hasError('minlength')) {
+            <p class="mensaje-error" role="alert">La contraseña debe tener al menos 6 caracteres.</p>
           }
         </div>
 
         <div class="fila-opciones">
-          <label class="checkbox-label">
-            <input type="checkbox" formControlName="recordarme" />
-            <span>Recordarme</span>
-          </label>
-
-          <a routerLink="/olvide-contrasena" class="enlace-acento">
-            ¿Olvidaste tu contraseña?
-          </a>
+          <a routerLink="/olvide-contrasena" class="enlace-acento">¿Olvidaste tu contraseña?</a>
         </div>
 
-        <button type="submit" class="boton-submit">
-          Iniciar sesión
+        <button type="submit" class="boton-submit" [disabled]="enviando()">
+          @if (enviando()) {
+            <span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>
+            Ingresando...
+          } @else {
+            Iniciar sesión
+          }
         </button>
       </form>
 
-      <div class="acceso-rapido" aria-label="Cuentas de demostración">
-        <p class="acceso-titulo">Cargar credenciales de prueba por rol:</p>
-        <div class="chips-demo">
-          @for (cuenta of cuentasDemo; track cuenta.correo) {
-            <button
-              type="button"
-              class="chip-demo"
-              (click)="rellenarCuentaDemo(cuenta)"
-              [title]="cuenta.descripcion"
-            >
-              {{ cuenta.etiqueta }}
-            </button>
-          }
-        </div>
-      </div>
-
       <footer class="auth-pie">
         <span>¿No tienes una cuenta?</span>
-        <a routerLink="/registro" class="enlace-acento fw-semibold">
-          Regístrate
-        </a>
+        <a routerLink="/registro" class="enlace-acento fw-semibold">Regístrate</a>
       </footer>
     </div>
 

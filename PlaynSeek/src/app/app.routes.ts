@@ -28,6 +28,7 @@ import { MATCH_ROUTES } from './features/match/match.routes';
 import { CHAT_ROUTES } from './features/chat/chat.routes';
 import { ADMIN_ROUTES } from './features/admin/admin.routes';
 import { MODERACION_ROUTES } from './features/moderacion/moderacion.routes';
+import { guestGuard } from '@core/guards/guest-guard';
 
 export const routes: Routes = [
   // ZONA PÚBLICA = se ve sin iniciar sesión
@@ -40,7 +41,7 @@ export const routes: Routes = [
 
       // Esta ruta no tiene componente, solo agrupa 
       // las rutas de auth (login, registro...) quedan colgadas del mismo layout público
-      { path: '', children: AUTH_ROUTES },
+      { path: '',canActivate:[guestGuard] ,children: AUTH_ROUTES },
     ],
   },
 
@@ -75,11 +76,6 @@ export const routes: Routes = [
 
 
   // PANTALLAS DE ERROR
-
-  // /403: cuando un usuario intenta entrar a algo sin permiso
   { path: '403', component: Forbidden },
-
-  // '**' coincide con cualquier URL que no haya
-  // coincidido con nada antes.
   { path: '**', component: NotFound },
 ];
