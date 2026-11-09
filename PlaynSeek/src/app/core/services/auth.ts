@@ -4,17 +4,35 @@
 // navbar y el interceptor del token le preguntan a este servicio.
 // ============================================================
 
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { Observable, tap, firstValueFrom } from 'rxjs';
+import { Observable, tap, firstValueFrom, timeout } from 'rxjs';
 
 import { environment } from '@env/environment';
 import { Rol, Usuario } from '@shared/models/usuario';
+
+//-----Registro
+// Lo que se manda 
+export interface DatosRegistro {
+  name: string;
+  email: string;
+  password: string;
+}
+// El back responde 
+interface RespuestaRegistro {
+  message: string;
+  user: { _id: string; nombre: string; correo: string; rol: Rol };
+}
+
+
+
+//-----Login
 
 // El back responde solo { token } al hacer login
 interface RespuestaLogin {
   token: string;
 }
+
 
 // El back responde esto en GET /user/me (viene del token, sin consultar la base)
 interface RespuestaMe {
@@ -78,10 +96,23 @@ export class Auth {
     return localStorage.getItem(CLAVE_TOKEN);
   }
 
+  //---REGISTRO---
+  // POST /user/register con { name, email, password }
+  // el back manda un correo de confirmación y bloquea el login hasta que
+  // el usuario confirme. Si el correo ya existe, responde 400.
+  registrar(datos: DatosRegistro): Observable<RespuestaRegistro> {
+    return this.http.post<RespuestaRegistro>(environment.apiUrl + '/user/register', {
+      name: datos.name,
+      email: datos.email,
+      password: datos.password,
+    });
+  }
 
-  //--Login REAL---
-  // POST /user/login con { email, password } Si sale bien, guardamos el
-  // token y pedimos los datos del usuario a GET /user/me
+
+  //--- LOGIN ---
+  // POST /user/login con { email, password } 
+  // Si sale bien, guardamos el token y pedimos los datos del usuario a GET /user/me
+  
   // tap() ejecuta algo con la respuesta sin cambiarla
   login(email: string, password: string): Observable<RespuestaLogin> {
     return this.http
@@ -120,20 +151,26 @@ export class Auth {
     }
 
     try {
-      await firstValueFrom(this.cargarUsuario());
-    } catch {
-      localStorage.removeItem(CLAVE_TOKEN);
+      await firstValueFrom(this.cargarUsuario().pipe(timeout(5000)));
+    } catch (error) {
+      if (error instanceof HttpErrorResponse && error.status === 401) {
+        localStorage.removeItem(CLAVE_TOKEN);
+      }
       this.usuarioActual = null;
     }
   }
 
 
+
+  //--- CERRAR SESION ---
   //  borra el token y deja de haber usuario
   cerrarSesion(): void {
     localStorage.removeItem(CLAVE_TOKEN);
     this.usuarioActual = null;
   }
 
+
+  //--TEMPORALES----
   //temporal
   iniciarSesion(): void {
     this.usuarioActual = USUARIO_PRUEBA;
