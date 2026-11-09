@@ -5,7 +5,8 @@
 
 import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+
 
 import { Auth } from '@core/services/auth';
 import { Notification } from '@core/services/notification';
@@ -24,9 +25,12 @@ interface CuentaDemo {
   templateUrl: './login.html',
   styleUrl: './login.scss',
 })
+
+
 export class Login {
   private fb = inject(FormBuilder);
   private router = inject(Router);
+  private route = inject(ActivatedRoute);
   auth = inject(Auth);
   notificacion = inject(Notification);
 
@@ -103,17 +107,34 @@ export class Login {
     });
   }
 
-  //  con el token guardado, pedimos quien es el usuario (id, correo, rol)
+
+  // con el token guardado, pedimos quien es el usuario y lo
+  // regresamos a la ruta que queria visitar o al dashboard
   private cargarSesion(): void {
     this.auth.cargarUsuario().subscribe({
       next: () => {
         this.enviando.set(false);
         this.notificacion.exito(
-          '¡Bienvenido de vuelta, ' + (this.auth.usuarioActual?.nombre.split(' ')[0] ?? 'Jugador') + '!'
+          '¡Bienvenido de vuelta, ' +
+            (this.auth.usuarioActual?.nombre.split(' ')[0] ?? 'Jugador') +
+            '!'
         );
-        this.router.navigate(['/dashboard']);
+        this.router.navigateByUrl(this.rutaDeRegreso());
       },
       error: () => this.enviando.set(false),
     });
+  }
+
+  // esta funcion devuelve la ruta a la que el usuario queria entrar
+  // antes de ser redirigido al login
+  private rutaDeRegreso(): string {
+    const destino = this.route.snapshot.queryParamMap.get('returnUrl');
+
+    // Si el returnUrl es una ruta relativa (empieza con / pero no con //) la devolvemos
+    // esta validación evita que alguien ponga un returnUrl externo y nos haga redirigir a otro sitio
+    if (destino && destino.startsWith('/') && !destino.startsWith('//')) {
+      return destino;
+    }
+    return '/dashboard';
   }
 }
