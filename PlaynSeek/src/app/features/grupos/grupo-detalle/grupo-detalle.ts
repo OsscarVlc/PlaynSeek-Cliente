@@ -10,6 +10,8 @@ import { GrupoApi } from '@core/services/grupo-api';
 import { Notification } from '@core/services/notification';
 import { Grupo } from '@shared/models/grupo';
 
+import { HasRole } from '@shared/directives/has-role';
+
 type TabGrupo = 'posts' | 'chat' | 'integrantes';
 type AccionIntegrante = 'transferir' | 'expulsar';
 
@@ -47,7 +49,7 @@ interface ConfirmacionIntegrante {
 
 @Component({
   selector: 'app-grupo-detalle',
-  imports: [RouterLink, FormsModule, DatePipe],
+  imports: [RouterLink, FormsModule, DatePipe, HasRole],
   templateUrl: './grupo-detalle.html',
   styleUrl: './grupo-detalle.scss',
 })
@@ -241,7 +243,28 @@ export class GrupoDetalle implements OnInit {
   // Confirma la acción de transferir liderazgo o expulsar a un integrante
   confirmarAccion(): void {
     const pendiente = this.confirmacion();
-    if (!pendiente || !this.esLider()) return;
+    if (!pendiente || this.procesando()) return;
+
+    // Transferir requiere ser líder; expulsar permite líder o administrador.
+    const puedeRealizarAccion = pendiente.accion === 'transferir'
+      ? this.esLider()
+      : this.esLider() || this.auth.tieneRol(['administrador']);
+
+    if (!puedeRealizarAccion) {
+      this.notificacion.advertencia('No tienes permiso para realizar esta acción.');
+      this.confirmacion.set(null);
+      return;
+    }
+
+    // El líder debe transferir el liderazgo antes de abandonar el grupo.
+    if (
+      pendiente.accion === 'expulsar' &&
+      pendiente.integranteId === this.grupo()?.lider_id
+    ) {
+      this.notificacion.advertencia('No se puede expulsar al líder del grupo.');
+      this.confirmacion.set(null);
+      return;
+    }
 
     this.procesando.set(true);
 

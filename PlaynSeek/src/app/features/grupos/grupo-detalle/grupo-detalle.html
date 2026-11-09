@@ -394,9 +394,21 @@
                       >
                         Hacer líder
                       </button>
+
                       <button
                         type="button"
                         class="boton-peligro"
+                        [disabled]="procesando()"
+                        (click)="pedirConfirmacion('expulsar', integranteId)"
+                      >
+                        Expulsar
+                      </button>
+                    } @else if (integranteId !== grupoActual.lider_id) {
+                      <button
+                        *appHasRole="['administrador']"
+                        type="button"
+                        class="boton-peligro"
+                        [disabled]="procesando()"
                         (click)="pedirConfirmacion('expulsar', integranteId)"
                       >
                         Expulsar

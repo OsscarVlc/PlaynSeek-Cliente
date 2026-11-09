@@ -9,11 +9,14 @@ import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { Auth } from '@core/services/auth';
 import { Notification } from '@core/services/notification';
 
+import { HasRole } from '@shared/directives/has-role';
+
 @Component({
   selector: 'app-navbar',
-  imports: [RouterLink, RouterLinkActive],
-  templateUrl: './navbar.html',
+  imports: [RouterLink, RouterLinkActive, HasRole],
+  templateUrl: './navbar.html', 
   styleUrl: './navbar.scss',
+  
 })
 export class Navbar {
   // Publicos para poder usarlos directo desde el HTML

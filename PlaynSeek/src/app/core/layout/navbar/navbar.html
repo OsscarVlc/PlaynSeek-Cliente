@@ -30,20 +30,17 @@
           </button>
 
           <ul class="dropdown-menu dropdown-menu-end">
+            <li *appHasRole="['administrador', 'moderador']">
+              <a class="dropdown-item" routerLink="/moderacion/reportes">Reportes</a>
+            </li>
 
-            @if (auth.tieneRol(['administrador', 'moderador'])) {
-              <li>
-                <a class="dropdown-item" routerLink="/moderacion/reportes">Reportes</a>
-              </li>
-            }
-            @if (auth.tieneRol(['administrador'])) {
-              <li>
-                <a class="dropdown-item" routerLink="/admin/usuarios">Usuarios</a>
-              </li>
-            }
-            @if (auth.tieneRol(['administrador', 'moderador'])) {
-              <li><hr class="dropdown-divider" /></li>
-            }
+            <li *appHasRole="['administrador']">
+              <a class="dropdown-item" routerLink="/admin/usuarios">Usuarios</a>
+            </li>
+
+            <li *appHasRole="['administrador', 'moderador']">
+              <hr class="dropdown-divider" />
+            </li>
             <li>
               <button type="button" class="dropdown-item text-danger" (click)="salir()">
                 Cerrar sesión
