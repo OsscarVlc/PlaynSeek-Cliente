@@ -1,10 +1,18 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component, computed, inject, signal } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import {
+  AbstractControl,
+  FormBuilder,
+  ReactiveFormsModule,
+  ValidationErrors,
+  Validators,
+} from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 
 import { Auth } from '@core/services/auth';
-import { Confirm } from '@core/services/confirm';
 import { Notification } from '@core/services/notification';
+import { noSoloEspacios } from '@shared/validators/no-solo-espacios';
 
 @Component({
   selector: 'app-register',
@@ -17,19 +25,62 @@ export class Register {
   private router = inject(Router);
   auth = inject(Auth);
   notificacion = inject(Notification);
-  confirmar = inject(Confirm);
 
   readonly mostrarPassword = signal(false);
   readonly mostrarConfirmar = signal(false);
   readonly passwordTexto = signal('');
 
-  readonly formulario = this.fb.nonNullable.group({
-    nombre: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(40)]],
-    correo: ['', [Validators.required, Validators.email]],
-    password: ['', [Validators.required, Validators.minLength(8)]],
-    confirmarPassword: ['', [Validators.required]],
-    aceptaTerminos: [false, [Validators.requiredTrue]],
-  });
+  // true mientras viaja la petición al backend para deshabilitar el botón
+  readonly enviando = signal(false);
+
+  // Mensaje cuando el correo ya está registrado en el backend
+  readonly errorCorreo = signal('');
+
+  readonly formulario = this.fb.nonNullable.group(
+    {
+      nombre: [
+        '',
+        [
+          Validators.required,
+          noSoloEspacios(),
+          Validators.minLength(3),
+          Validators.maxLength(40),
+        ],
+      ],
+      correo: ['', [Validators.required, Validators.email]],
+      password: ['', [Validators.required, Validators.minLength(8)]],
+      confirmarPassword: ['', [Validators.required]],
+      aceptaTerminos: [false, [Validators.requiredTrue]],
+    },
+    {
+      validators: [
+        (group: AbstractControl): ValidationErrors | null => {
+          const pass = group.get('password')?.value;
+          const conf = group.get('confirmarPassword')?.value;
+          if (conf && pass !== conf) {
+            return { noCoinciden: true };
+          }
+          return null;
+        },
+      ],
+    }
+  );
+
+  constructor() {
+    // Si el usuario modifica el correo, limpiamos el error del intento previo
+    this.formulario.controls.correo.valueChanges
+      .pipe(takeUntilDestroyed())
+      .subscribe(() => {
+        this.errorCorreo.set('');
+        if (this.formulario.controls.correo.hasError('yaExiste')) {
+          const errors = { ...this.formulario.controls.correo.errors };
+          delete errors['yaExiste'];
+          this.formulario.controls.correo.setErrors(
+            Object.keys(errors).length ? errors : null
+          );
+        }
+      });
+  }
 
   readonly nivelFortaleza = computed(() => {
     const valor = this.passwordTexto();
@@ -73,9 +124,7 @@ export class Register {
   }
 
   registrarseConGoogle(): void {
-    this.auth.iniciarSesion();
-    this.notificacion.exito('Cuenta vinculada con Google correctamente.');
-    this.router.navigate(['/dashboard']);
+    this.notificacion.info('El registro con Google estará disponible pronto');
   }
 
   verDocumento(nombreDoc: string, event: Event): void {
@@ -101,22 +150,40 @@ export class Register {
       return;
     }
 
-    const { nombre, correo } = this.formulario.getRawValue();
+    const { nombre, correo, password } = this.formulario.getRawValue();
 
-    this.confirmar.pedir(
-      `¿Confirmas el registro de la cuenta "${nombre.trim()}" con el correo ${correo.trim()}? Te enviaremos un enlace de verificación.`,
-      () => {
-        this.notificacion.exito(
-          `¡Cuenta creada para ${nombre.trim()}! Revisa tu correo para confirmarla.`
-        );
-        this.router.navigate(['/confirmar-correo'], {
-          queryParams: {
-            correo: correo.trim(),
-            nombre: nombre.trim(),
-          },
-        });
-      },
-      'Confirmar creación de cuenta'
-    );
+    this.enviando.set(true);
+    this.errorCorreo.set('');
+
+    this.auth
+      .registrar({
+        name: nombre.trim(),
+        email: correo.trim().toLowerCase(),
+        password: password,
+      })
+      .subscribe({
+        next: (res) => {
+          this.enviando.set(false);
+          this.notificacion.exito(
+            res.message ?? `¡Cuenta creada para ${nombre.trim()}! Revisa tu correo para confirmarla.`
+          );
+          this.router.navigate(['/confirmar-correo'], {
+            queryParams: {
+              correo: correo.trim().toLowerCase(),
+              nombre: nombre.trim(),
+            },
+          });
+        },
+        error: (err: HttpErrorResponse) => {
+          this.enviando.set(false);
+          if (err.status === 400) {
+            const mensaje =
+              err.error?.message ?? 'Este correo ya esta siendo utilizado';
+            this.errorCorreo.set(mensaje);
+            this.formulario.controls.correo.setErrors({ yaExiste: true });
+            this.formulario.controls.correo.markAsTouched();
+          }
+        },
+      });
   }
 }
