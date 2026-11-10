@@ -1,7 +1,6 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
-import { Auth } from '@core/services/auth';
 import { Confirm } from '@core/services/confirm';
 import { Notification } from '@core/services/notification';
 
@@ -14,7 +13,6 @@ import { Notification } from '@core/services/notification';
 export class ConfirmEmail implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
-  auth = inject(Auth);
   notificacion = inject(Notification);
   confirmar = inject(Confirm);
 
@@ -44,9 +42,8 @@ export class ConfirmEmail implements OnInit {
   }
 
   entrarAlPortal(): void {
-    this.auth.iniciarSesion();
-    this.notificacion.exito('Sesión iniciada. ¡Bienvenido a Play N Seek!');
-    this.router.navigate(['/dashboard']);
+    this.notificacion.exito('¡Correo verificado! Inicia sesión con tus credenciales.');
+    this.router.navigate(['/login']);
   }
 
   reenviarCorreo(): void {
