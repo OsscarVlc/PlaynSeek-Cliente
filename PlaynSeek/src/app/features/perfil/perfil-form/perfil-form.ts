@@ -16,8 +16,6 @@ import {
   PLATAFORMAS,
   Plataforma,
   PlataformaUsuario,
-  ROLES,
-  Rol,
   SEXOS,
   Sexo,
 } from '@shared/models/usuario';
@@ -42,7 +40,6 @@ export class PerfilForm {
   readonly modosDisponibles = MODOS_DE_JUEGO;
   readonly idiomasDisponibles = IDIOMAS;
   readonly plataformasCatalogo = PLATAFORMAS;
-  readonly rolesDisponibles = ROLES;
 
   readonly diasSemana = [
     'lunes',
@@ -323,13 +320,6 @@ export class PerfilForm {
     } else {
       this.notificacion.info(`Buscando squad pausado para ${titulo}.`);
     }
-  }
-
-  cambiarRolDemo(rol: Rol): void {
-    this.auth.cambiarRol(rol);
-    this.notificacion.info(
-      `Rol de sesión cambiado a "${rol}". Revisa el menú superior de usuario.`
-    );
   }
 
   restablecerFormulario(): void {

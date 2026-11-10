@@ -51,9 +51,16 @@
             formulario.controls.nombre.touched &&
             formulario.controls.nombre.invalid
           ) {
-            <p class="mensaje-error" role="alert">
-              El nombre debe tener entre 3 y 40 caracteres.
-            </p>
+            @if (formulario.controls.nombre.hasError('required')) {
+              <p class="mensaje-error" role="alert">El nombre es obligatorio.</p>
+            } @else if (formulario.controls.nombre.hasError('soloEspacios')) {
+              <p class="mensaje-error" role="alert">El nombre no puede contener únicamente espacios.</p>
+            } @else if (
+              formulario.controls.nombre.hasError('minlength') ||
+              formulario.controls.nombre.hasError('maxlength')
+            ) {
+              <p class="mensaje-error" role="alert">El nombre debe tener entre 3 y 40 caracteres.</p>
+            }
           }
         </div>
 
@@ -62,8 +69,9 @@
           <div
             class="input-icono"
             [class.invalido]="
-              formulario.controls.correo.touched &&
-              formulario.controls.correo.invalid
+              (formulario.controls.correo.touched &&
+                formulario.controls.correo.invalid) ||
+              !!errorCorreo()
             "
           >
             <i class="bi bi-envelope icono-izquierdo" aria-hidden="true"></i>
@@ -75,13 +83,19 @@
               autocomplete="email"
             />
           </div>
-          @if (
+          @if (errorCorreo()) {
+            <p class="mensaje-error" role="alert">{{ errorCorreo() }}</p>
+          } @else if (
             formulario.controls.correo.touched &&
             formulario.controls.correo.invalid
           ) {
-            <p class="mensaje-error" role="alert">
-              Ingresa una dirección de correo electrónico válida.
-            </p>
+            @if (formulario.controls.correo.hasError('required')) {
+              <p class="mensaje-error" role="alert">El correo es obligatorio.</p>
+            } @else if (formulario.controls.correo.hasError('email')) {
+              <p class="mensaje-error" role="alert">Ingresa una dirección de correo electrónico válida.</p>
+            } @else if (formulario.controls.correo.hasError('yaExiste')) {
+              <p class="mensaje-error" role="alert">Este correo ya está siendo utilizado.</p>
+            }
           }
         </div>
 
@@ -147,6 +161,17 @@
             </div>
             <p class="detalle-fortaleza">{{ detalleFortaleza() }}</p>
           </div>
+
+          @if (
+            formulario.controls.password.touched &&
+            formulario.controls.password.invalid
+          ) {
+            @if (formulario.controls.password.hasError('required')) {
+              <p class="mensaje-error" role="alert">La contraseña es obligatoria.</p>
+            } @else if (formulario.controls.password.hasError('minlength')) {
+              <p class="mensaje-error" role="alert">La contraseña debe tener al menos 8 caracteres.</p>
+            }
+          }
         </div>
 
         <div class="campo">
@@ -155,7 +180,7 @@
             class="input-icono"
             [class.invalido]="
               formulario.controls.confirmarPassword.touched &&
-              !passwordsCoinciden()
+              (formulario.controls.confirmarPassword.invalid || !passwordsCoinciden())
             "
           >
             <i class="bi bi-lock icono-izquierdo" aria-hidden="true"></i>
@@ -186,11 +211,13 @@
           </div>
           @if (
             formulario.controls.confirmarPassword.touched &&
-            !passwordsCoinciden()
+            (formulario.controls.confirmarPassword.invalid || !passwordsCoinciden())
           ) {
-            <p class="mensaje-error" role="alert">
-              Las contraseñas no coinciden.
-            </p>
+            @if (formulario.controls.confirmarPassword.hasError('required')) {
+              <p class="mensaje-error" role="alert">Por favor confirma tu contraseña.</p>
+            } @else if (!passwordsCoinciden()) {
+              <p class="mensaje-error" role="alert">Las contraseñas no coinciden.</p>
+            }
           }
         </div>
 
@@ -218,8 +245,13 @@
           </label>
         </div>
 
-        <button type="submit" class="boton-submit">
-          Crear cuenta
+        <button type="submit" class="boton-submit" [disabled]="enviando()">
+          @if (enviando()) {
+            <span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>
+            Creando cuenta...
+          } @else {
+            Crear cuenta
+          }
         </button>
       </form>
 

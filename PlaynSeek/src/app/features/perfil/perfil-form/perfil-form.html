@@ -110,22 +110,14 @@
             </div>
           </div>
           <div class="resumen-bloque">
-            <h3>Rol activo en la demostración</h3>
+            <h3>Rol asignado</h3>
             <p class="texto-suave small mb-2">
-              Cambia de rol para probar las vistas de Moderación y Admin:
+              El rol proviene de tu sesión activa:
             </p>
-            <div class="chips-rol">
-              @for (rol of rolesDisponibles; track rol) {
-                <button
-                  type="button"
-                  class="chip-rol"
-                  [class.activo]="auth.usuarioActual?.rol === rol"
-                  (click)="cambiarRolDemo(rol)"
-                >
-                  {{ rol }}
-                </button>
-              }
-            </div>
+            <span class="chip-rol activo text-capitalize">
+              <i class="bi bi-shield-check me-1" aria-hidden="true"></i>
+              {{ auth.usuarioActual?.rol ?? 'usuario' }}
+            </span>
           </div>
         </div>
       </div>
