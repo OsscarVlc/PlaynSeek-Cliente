@@ -1,0 +1,52 @@
+.estado-conexion {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border: 1px solid #303140;
+  border-radius: 999px;
+  background: #191a25;
+  color: #b4b5c4;
+  font-size: 0.72rem;
+  white-space: nowrap;
+}
+
+.punto {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #6b6c80;
+}
+
+// Un color por estado
+.conectado .punto {
+  background: #bcff62;
+}
+
+.conectando .punto,
+.reconectando .punto {
+  background: #f6d47b;
+  animation: parpadeo 1s ease-in-out infinite;
+}
+
+.desconectado .punto {
+  background: #ff7a7a;
+}
+
+.reconectando,
+.desconectado {
+  border-color: #80515c;
+}
+
+@keyframes parpadeo {
+  50% {
+    opacity: 0.3;
+  }
+}
+
+// En pantallas angostas solo se ve el punto
+@media (max-width: 576px) {
+  .texto {
+    display: none;
+  }
+}
