@@ -17,6 +17,8 @@
 
     <div class="acciones">
       @if (auth.estaAutenticado()) {
+        <app-estado-conexion />
+
         <button type="button" class="campana" (click)="verNotificaciones()">
           <i class="bi bi-bell"></i>
           <span class="punto"></span>

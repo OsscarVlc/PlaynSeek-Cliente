@@ -3,4 +3,5 @@
 export const environment = {
   production: true,
   apiUrl: 'https://api.ejemplo.com',
+  socketUrl: 'https://api.ejemplo.com',
 };

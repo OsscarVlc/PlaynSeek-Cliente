@@ -1,103 +1,76 @@
 // ============================================================
 // core/services/auth.ts
-// Guarda quién es el usuario con sesión y su token. Los guards, la
-// navbar y el interceptor del token le preguntan a este servicio.
 // ============================================================
 
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { Observable, tap, firstValueFrom, timeout } from 'rxjs';
+import { Observable, firstValueFrom, tap, timeout } from 'rxjs';
 
 import { environment } from '@env/environment';
+import { Realtime } from '@core/services/realtime';
 import { Rol, Usuario } from '@shared/models/usuario';
 
-//-----Registro
-// Lo que se manda 
+// Lo que se manda al registrarse. El back espera estos nombres en inglés.
 export interface DatosRegistro {
   name: string;
   email: string;
   password: string;
 }
-// El back responde 
+
+// El back responde esto al registrarse (no incluye token: primero hay
+// que confirmar el correo)
 interface RespuestaRegistro {
   message: string;
   user: { _id: string; nombre: string; correo: string; rol: Rol };
 }
-
-
-
-//-----Login
 
 // El back responde solo { token } al hacer login
 interface RespuestaLogin {
   token: string;
 }
 
-
-// El back responde esto en GET /user/me (viene del token, sin consultar la base)
+// El back responde esto en GET /user/me
 interface RespuestaMe {
   message: string;
   user: { id: string; correo: string; rol: Rol; nombre: string; foto_perfil?: string };
 }
 
-
 // Nombre con el que se guarda el token en el navegador
 const CLAVE_TOKEN = 'pns_token';
-
-
-// Usuario de prueba para la sesion SIMULADA que todavía usan las pantallas
-// de registro y confirmar correo
-const USUARIO_PRUEBA: Usuario = {
-  _id: 'u1',
-  nombre: 'Oscar Velasco',
-  correo: 'oscar@correo.com',
-  rol: 'usuario',
-  isActive: true,
-  correo_confirmado: true,
-};
-
 
 @Injectable({
   providedIn: 'root',
 })
-
-
 export class Auth {
   private http = inject(HttpClient);
-  // Aquí vive la sesion 
-  // Si es null, nadie ha iniciado sesio
-  // POR AHORA EMPIEZA con el usuario de prueba para poder ver el portal
+  private realtime = inject(Realtime);
+
+  // Aquí vive la sesión. Si es null, nadie ha iniciado sesión.
   usuarioActual: Usuario | null = null;
 
-  // ¿Hay alguien con sesion?
-  //  devuelve true cuando sI hay un usuario
+  // ¿Hay alguien con sesión? Lo usan authGuard y guestGuard.
   estaAutenticado(): boolean {
     return this.usuarioActual !== null;
   }
 
-  // ¿El usuario actual tiene alguno de estos roles?
-  // Recibe una lista porque algunas secciones aceptan mas de uno
+  // ¿El usuario actual tiene alguno de estos roles? Lo usa roleGuard.
   tieneRol(roles: Rol[]): boolean {
-    // Sin sesion no hay rol
     if (this.usuarioActual === null) {
       return false;
     }
-    // revisa si el rol del usuario aparece en la lista
     return roles.includes(this.usuarioActual.rol);
   }
 
+  // ---------- Token ----------
 
-
-  //---TOKEN--
-  // Lee el token guardado y devuelve null si no hay
-  // localStorage guarda texto en el navegador y sobrevive aL recargar la pagina
-
+  // Lee el token guardado. Devuelve null si no hay.
   obtenerToken(): string | null {
     return localStorage.getItem(CLAVE_TOKEN);
   }
 
-  //---REGISTRO---
-  // POST /user/register con { name, email, password }
+  // ---------- Registro ----------
+
+  // POST /user/register con { name, email, password }. No inicia sesión:
   // el back manda un correo de confirmación y bloquea el login hasta que
   // el usuario confirme. Si el correo ya existe, responde 400.
   registrar(datos: DatosRegistro): Observable<RespuestaRegistro> {
@@ -108,15 +81,12 @@ export class Auth {
     });
   }
 
+  // ---------- Login ----------
 
-  //--- LOGIN ---
-  // POST /user/login con { email, password } 
-  // Si sale bien, guardamos el token y pedimos los datos del usuario a GET /user/me
-  
-  // tap() ejecuta algo con la respuesta sin cambiarla
+  // POST /user/login con { email, password }. Si sale bien, guardamos el token.
   login(email: string, password: string): Observable<RespuestaLogin> {
     return this.http
-      .post<RespuestaLogin>(environment.apiUrl + '/user/login', { email: email, password: password })
+      .post<RespuestaLogin>(environment.apiUrl + '/user/login', { email, password })
       .pipe(
         tap((respuesta) => {
           localStorage.setItem(CLAVE_TOKEN, respuesta.token);
@@ -124,12 +94,15 @@ export class Auth {
       );
   }
 
-
-  // GET /user/me: trae id, correo y rol, etc y los deja como usuario actual
+  // GET /user/me: trae id, correo, rol, nombre y foto, y los deja como
+  // usuario actual. El rol siempre sale de aquí, nunca de la interfaz.
+  // Con la sesión ya confirmada, abre la conexión en tiempo real.
+  // Lo usan el login y recuperarSesion(), así que la conexión se abre
+  // tanto al iniciar sesión como al recargar la página.
   cargarUsuario(): Observable<RespuestaMe> {
     return this.http.get<RespuestaMe>(environment.apiUrl + '/user/me').pipe(
       tap((respuesta) => {
-         this.usuarioActual = {
+        this.usuarioActual = {
           _id: respuesta.user.id,
           nombre: respuesta.user.nombre,
           correo: respuesta.user.correo,
@@ -138,13 +111,19 @@ export class Auth {
           isActive: true,
           correo_confirmado: true,
         };
+
+        const token = this.obtenerToken();
+        if (token !== null) {
+          this.realtime.conectar(token);
+        }
       }),
     );
   }
 
-  // Se ejecuta una vez al arrancar la app
-  // si hay un token guardado, pide quien es el usuario
-  // si el token ya no sirve, lo borra y la app queda sin sesion
+  // Se ejecuta una vez al arrancar la app. Si hay un token guardado, pide
+  // quién es el usuario. Tiene un límite de 5 segundos para que, si el back
+  // no responde, la app arranque igual (sin sesión) y no se quede cargando.
+  // El token solo se borra si el back responde 401 (ya no sirve).
   async recuperarSesion(): Promise<void> {
     if (this.obtenerToken() === null) {
       return;
@@ -160,28 +139,13 @@ export class Auth {
     }
   }
 
+  // ---------- Cerrar sesión ----------
 
-
-  //--- CERRAR SESION ---
-  //  borra el token y deja de haber usuario
+  // Borra el token, deja de haber usuario y cierra la conexión en tiempo
+  // real. También lo usa el interceptor cuando la sesión expira (401).
   cerrarSesion(): void {
     localStorage.removeItem(CLAVE_TOKEN);
     this.usuarioActual = null;
+    this.realtime.desconectar();
   }
-
-
-  //--TEMPORALES----
-  //temporal
-  iniciarSesion(): void {
-    this.usuarioActual = USUARIO_PRUEBA;
-  }
-
-  // TEMPORAL
-  cambiarRol(rol: Rol): void {
-    if (this.usuarioActual !== null) {
-      this.usuarioActual.rol = rol;
-    }
-  }
-
-
 }

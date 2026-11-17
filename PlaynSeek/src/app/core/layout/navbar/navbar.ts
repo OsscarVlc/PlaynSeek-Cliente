@@ -10,10 +10,11 @@ import { Auth } from '@core/services/auth';
 import { Notification } from '@core/services/notification';
 
 import { HasRole } from '@shared/directives/has-role';
+import { EstadoConexion } from '@core/layout/estado-conexion/estado-conexion';
 
 @Component({
   selector: 'app-navbar',
-  imports: [RouterLink, RouterLinkActive, HasRole],
+  imports: [RouterLink, RouterLinkActive, HasRole, EstadoConexion],
   templateUrl: './navbar.html', 
   styleUrl: './navbar.scss',
   
