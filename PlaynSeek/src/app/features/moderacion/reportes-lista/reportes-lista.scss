@@ -134,3 +134,89 @@
     grid-template-columns: 1fr 1fr;
   }
 }
+
+
+// Las tarjetas del resumen ahora son botones que filtran
+button.dato {
+  width: 100%;
+  border: 1px solid var(--pns-color-borde);
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 160ms ease;
+
+  &:hover,
+  &.activo {
+    border-color: var(--pns-color-primario);
+  }
+}
+
+.estado-centro {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 3rem 0;
+
+  .spinner-border {
+    color: var(--pns-color-primario);
+  }
+}
+
+.paginacion {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 1rem 0 0.5rem;
+
+  button {
+    padding: 0.4rem 0.9rem;
+    border: 1px solid var(--pns-color-borde);
+    border-radius: 8px;
+    background: transparent;
+    color: var(--pns-color-texto);
+
+    &:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+  }
+}
+
+.acciones button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+
+// ---------- Ajustes de espacio en la tabla ----------
+
+// Separación entre la columna Estado y la de Acciones
+.tabla th:nth-child(6),
+.tabla td:nth-child(6) {
+  padding-right: 1.5rem;
+}
+
+// La columna de acciones ocupa solo lo que necesitan sus botones
+// (width: 1% + nowrap) y lleva espacio a la izquierda
+.tabla th:last-child,
+.tabla td:last-child {
+  width: 1%;
+  padding-left: 1.5rem;
+  white-space: nowrap;
+}
+
+.acciones {
+  display: flex;
+  justify-content: flex-start;
+  gap: 0.5rem;
+}
+
+// Dónde, Fecha y Estado en una sola línea; el espacio sobrante
+// se lo queda la columna de Motivo
+.tabla td:nth-child(4),
+.tabla td:nth-child(5),
+.tabla td:nth-child(6) {
+  white-space: nowrap;
+}

@@ -5,33 +5,42 @@
 
 import { UsuarioResumen } from './usuario';
 
-// Arreglo de valores + tipo derivado, igual que con roles y estados
-// Son los mismos textos que el enum motivoReporte del back
+// Mismos textos que el enum motivoReporte del back
 export const MOTIVOS_REPORTE = ['spam', 'acoso', 'contenido_inapropiado', 'otro'] as const;
 export type MotivoReporte = (typeof MOTIVOS_REPORTE)[number];
 
-// Mismos textos que el enum estadoReporte del back.
+// Mismos textos que el enum estadoReporte del back
 export const ESTADOS_REPORTE = ['pendiente', 'resuelto', 'rechazado'] as const;
 export type EstadoReporte = (typeof ESTADOS_REPORTE)[number];
 
+// El reporte tal como se guarda =
 export interface Reporte {
-  _id: string; // id interno de Mongo
-  remitente_id: string; // id de quien hace el reporte
-  reportado_id: string; // id del usuario reportado (siempre un usuario)
+  _id: string;
+  remitente_id: string; // quien reporta
+  reportado_id: string; // el usuario reportado
   motivo: MotivoReporte;
-  descripcion?: string; // opcional: el usuario puede no explicar más
-  estado: EstadoReporte; // en el back arranca como 'pendiente'
-  fecha: string; // en el JSON llega como texto ISO
+  descripcion?: string;
+  estado: EstadoReporte; // el back lo crea como 'pendiente'
+  fecha: string; // texto ISO
 
-  // Contexto opcional
-  // Un reporte puede venir de un grupo, de un post o de un comentario,o de ninguno si se reportó directo a un usuario.
+  // Contexto opcional: dónde ocurrió lo reportado
   grupo_id?: string;
   post_id?: string;
   comentario_id?: string;
+}
 
-  // --- Campos extra para el front ---
-  // Representan lo que el API devolvería al hacer populate de
-  // remitente_id y reportado_id, para pintar nombres directo en la tabla.
-  remitente?: UsuarioResumen;
-  reportado?: UsuarioResumen;
+// El reporte como llega en el LISTADO
+export interface ReporteConUsuarios extends Omit<Reporte, 'remitente_id' | 'reportado_id'> {
+  remitente_id: UsuarioResumen | null;
+  reportado_id: UsuarioResumen | null;
+}
+
+// Lo que se manda al crear un reporte
+export interface DatosReporte {
+  reportado_id: string;
+  motivo: MotivoReporte;
+  descripcion?: string;
+  grupo_id?: string;
+  post_id?: string;
+  comentario_id?: string;
 }
