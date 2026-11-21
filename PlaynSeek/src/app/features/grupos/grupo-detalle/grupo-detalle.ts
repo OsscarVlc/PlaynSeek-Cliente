@@ -1,4 +1,9 @@
-import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { Component, DestroyRef, OnInit, computed, effect, inject, signal, untracked } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { firstValueFrom, Subscription } from 'rxjs';
+
+import { Realtime } from '@core/services/realtime';
+import { MensajeGrupo } from '@shared/models/mensaje-grupo';
 import { DatePipe } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
@@ -11,6 +16,8 @@ import { Notification } from '@core/services/notification';
 import { Grupo } from '@shared/models/grupo';
 
 import { HasRole } from '@shared/directives/has-role';
+
+import { PostApi } from '@core/services/post-api';
 
 type TabGrupo = 'posts' | 'chat' | 'integrantes';
 type AccionIntegrante = 'transferir' | 'expulsar';
@@ -60,6 +67,11 @@ export class GrupoDetalle implements OnInit {
   private readonly auth = inject(Auth);
   private readonly confirmar = inject(Confirm);
   private readonly notificacion = inject(Notification);
+  readonly realtime = inject(Realtime);
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly postApi = inject(PostApi);
+  readonly guardandoPost = signal(false);
+  private cargaDePosts = 0;
 
   // id del grupo que viene en la URL
   private grupoId = '';
@@ -124,9 +136,107 @@ export class GrupoDetalle implements OnInit {
   motivoReporte = '';
 
 
+constructor() {
+  effect((alSalir) => {
+    const grupo = this.grupo();
 
+    if (this.cargando() || this.tabActual() !== 'chat' || !grupo || !this.esIntegrante()) {
+      return;
+    }
 
+    // Este efecto solo debe reaccionar al grupo, la membresía y la pestaña.
+    // Las reconexiones las maneja alConectar().
+    const cerrarSala = untracked(() => this.abrirSalaChat(grupo._id));
+    alSalir(cerrarSala);
+  });
+}
 
+private abrirSalaChat(grupoId: string): () => void {
+  let escuchas = new Subscription();
+
+  const conexion = this.realtime.alConectar()
+    .pipe(takeUntilDestroyed(this.destroyRef))
+    .subscribe(() => {
+      // Al reconectar, quitamos las escuchas anteriores antes de registrarlas otra vez.
+      escuchas.unsubscribe();
+      escuchas = new Subscription();
+
+      escuchas.add(
+        this.realtime.escuchar<MensajeGrupo[]>('historial')
+          .pipe(takeUntilDestroyed(this.destroyRef))
+          .subscribe((lista) => {
+            if (lista.some((mensaje) => mensaje.grupo_id !== grupoId)) return;
+
+            // Un mensaje en vivo puede llegar mientras el servidor consulta el historial.
+            // Combinamos por id para no perderlo ni mostrarlo dos veces.
+            this.mensajes.update((actuales) => {
+              const porId = new Map<string, MensajeDemo>();
+
+              for (const mensaje of lista) {
+                porId.set(mensaje._id, this.aMensajeVista(mensaje));
+              }
+              for (const mensaje of actuales) {
+                if (mensaje.grupoId === grupoId) porId.set(mensaje.id, mensaje);
+              }
+
+              return [...porId.values()].sort(
+                (a, b) => a.fecha.getTime() - b.fecha.getTime(),
+              );
+            });
+          }),
+      );
+
+      escuchas.add(
+        this.realtime.escuchar<MensajeGrupo>('mensaje_recibido')
+          .pipe(takeUntilDestroyed(this.destroyRef))
+          .subscribe((mensaje) => {
+            if (mensaje.grupo_id !== grupoId) return;
+
+            this.mensajes.update((actuales) => {
+              if (actuales.some((actual) => actual.id === mensaje._id)) return actuales;
+              return [...actuales, this.aMensajeVista(mensaje)];
+            });
+          }),
+      );
+
+      escuchas.add(
+        this.realtime.escuchar<string>('error_chat')
+          .pipe(takeUntilDestroyed(this.destroyRef))
+          .subscribe((aviso) => this.notificacion.advertencia(aviso)),
+      );
+
+      // El servidor responde con 'historial'. Las escuchas ya están listas.
+      this.realtime.emitir('unirse_grupo', grupoId);
+    });
+
+  let cerrada = false;
+  const cerrarSala = () => {
+    if (cerrada) return;
+    cerrada = true;
+    conexion.unsubscribe();
+    escuchas.unsubscribe();
+    this.realtime.emitir('salir_grupo', grupoId);
+  };
+
+  const quitarAlDestruir = this.destroyRef.onDestroy(cerrarSala);
+
+  // El constructor también llama esta limpieza al cambiar de pestaña o grupo.
+  return () => {
+    quitarAlDestruir();
+    cerrarSala();
+  };
+}
+
+private aMensajeVista(mensaje: MensajeGrupo): MensajeDemo {
+  return {
+    id: mensaje._id,
+    grupoId: mensaje.grupo_id,
+    autorId: mensaje.usuario_id,
+    autor: mensaje.nombreUsuario,
+    contenido: mensaje.contenido,
+    fecha: new Date(mensaje.fecha),
+  };
+}
 
   // Carga del grupo
 
@@ -149,6 +259,9 @@ export class GrupoDetalle implements OnInit {
       next: (grupo) => {
         this.grupo.set(grupo);
         this.cargando.set(false);
+        if (this.esIntegrante()) {
+          void this.cargarPosts(grupo._id);
+        }
       },
       error: (err: HttpErrorResponse) => {
         if (err.status === 404 || err.status === 400) {
@@ -163,7 +276,15 @@ export class GrupoDetalle implements OnInit {
 
   // Refresca los datos del grupo desde la API, sin cambiar de pantalla
   private refrescar(): void {
-    this.grupoApi.obtener(this.grupoId).subscribe((grupo) => this.grupo.set(grupo));
+    this.grupoApi.obtener(this.grupoId).subscribe((grupo) => {
+      this.grupo.set(grupo);
+
+      if (this.esIntegrante()) {
+        void this.cargarPosts(grupo._id);
+      } else {
+        this.publicaciones.set([]);
+      }
+    });
   }
 
   seleccionarTab(tab: TabGrupo): void {
@@ -320,28 +441,33 @@ export class GrupoDetalle implements OnInit {
 
 
   publicar(inputImagen: HTMLInputElement): void {
-    const grupo = this.grupo();
+    const grupoId = this.grupo()?._id;
     const contenido = this.nuevoPost.trim();
 
-    if (!grupo || !this.esIntegrante() || !contenido || this.leyendoImagenPost()) {
+    if (!grupoId || !this.esIntegrante() || !contenido ||
+        this.leyendoImagenPost() || this.guardandoPost()) {
       return;
     }
 
-    const post: PublicacionDemo = {
-      id: crypto.randomUUID(),
-      grupoId: grupo._id,
-      autor: this.nombreUsuario,
-      contenido,
-      imagen: this.imagenPost(),
-      comentarios: [],
-      fecha: new Date(),
-    };
+    const archivo = inputImagen.files?.[0];
+    this.guardandoPost.set(true);
 
-    // el post nuevo va primero, seguido de los que ya había
-    this.publicaciones.update((actuales) => [post, ...actuales]);
+    this.postApi.crear(grupoId, contenido, archivo).subscribe({
+      next: () => {
+        this.guardandoPost.set(false);
+        if (this.grupoId !== grupoId) return;
 
-    this.nuevoPost = '';
-    this.quitarImagenPost(inputImagen);
+        // Mongo ya confirmó el guardado. Ahora sí limpiamos el formulario
+        // y consultamos el muro para mostrar el post con su id real.
+        this.nuevoPost = '';
+        this.quitarImagenPost(inputImagen);
+        void this.cargarPosts(grupoId);
+      },
+      error: () => {
+        // El interceptor muestra el error; conservamos texto e imagen para reintentar.
+        this.guardandoPost.set(false);
+      },
+    });
   }
 
   seleccionarImagenPost(evento: Event): void {
@@ -423,16 +549,16 @@ export class GrupoDetalle implements OnInit {
 
     if (!grupo || !this.esIntegrante() || !contenido) return;
 
-    const mensaje: MensajeDemo = {
-      id: crypto.randomUUID(),
+    const enviado = this.realtime.emitir('mensaje_nuevo', {
       grupoId: grupo._id,
-      autorId: this.usuarioActualId,
-      autor: this.nombreUsuario,
       contenido,
-      fecha: new Date(),
-    };
+    });
 
-    this.mensajes.update((actuales) => [...actuales, mensaje]);
+    if (!enviado) {
+      this.notificacion.advertencia('Sin conexión. Tu mensaje sigue en el cuadro de texto.');
+      return;
+    }
+
     this.nuevoMensaje = '';
   }
 
@@ -460,4 +586,45 @@ export class GrupoDetalle implements OnInit {
       year: 'numeric',
     });
   }
+
+private async cargarPosts(grupoId: string): Promise<void> {
+  const carga = ++this.cargaDePosts;
+  const posts: PublicacionDemo[] = [];
+  let pagina = 1;
+  let totalPaginas: number;
+
+  try {
+    do {
+      const respuesta = await firstValueFrom(this.postApi.listar(grupoId, pagina));
+
+      // Si el usuario cambió de grupo o empezó otra carga, descartamos esta.
+      if (grupoId !== this.grupoId || carga !== this.cargaDePosts) return;
+
+      for (const post of respuesta.data) {
+        posts.push({
+          id: post._id,
+          grupoId: post.grupo_id,
+          autor: post.usuario_id === this.usuarioActualId
+            ? this.nombreUsuario
+            : this.nombreIntegrante(post.usuario_id),
+          contenido: post.contenido,
+          imagen: post.imagenes?.[0] ?? null,
+          comentarios: [],
+          fecha: new Date(post.fecha),
+        });
+      }
+
+      totalPaginas = respuesta.totalPaginas;
+      pagina++;
+    } while (pagina <= totalPaginas);
+
+    // El muro muestra primero las publicaciones más recientes.
+    posts.sort((a, b) => b.fecha.getTime() - a.fecha.getTime());
+    this.publicaciones.set(posts);
+  } catch {
+    // El interceptor ya muestra el error de la API.
+    // Conservamos el muro actual si falla la consulta.
+  }
 }
+}
+

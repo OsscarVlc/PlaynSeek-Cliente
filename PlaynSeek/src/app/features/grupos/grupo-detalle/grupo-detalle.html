@@ -158,7 +158,7 @@
                 <button
                   class="boton-principal"
                   type="submit"
-                  [disabled]="!nuevoPost.trim() || leyendoImagenPost()"
+                  [disabled]="!nuevoPost.trim() || leyendoImagenPost() || guardandoPost()"
                 >
                   Publicar
                 </button>
@@ -282,6 +282,9 @@
 
             <form class="chat-form" (ngSubmit)="enviarMensaje()">
               <label class="campo-label" for="mensaje-grupo">Tu mensaje</label>
+              @if (realtime.estado() !== 'conectado') {
+                <p role="status">Sin conexión al chat. Puedes seguir escribiendo mientras se restablece.</p>
+              }
 
               <div class="chat-input">
                 <input
@@ -292,7 +295,7 @@
                   placeholder="Escribe un mensaje..."
                   autocomplete="off"
                 />
-                <button type="submit" class="boton-principal" [disabled]="!nuevoMensaje.trim()">
+                <button type="submit" class="boton-principal" [disabled]="realtime.estado() !== 'conectado' || !nuevoMensaje.trim()">
                   Enviar
                 </button>
               </div>
