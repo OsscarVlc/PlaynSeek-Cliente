@@ -29,7 +29,11 @@
 
   <!-- ESTADO: con datos -->
   @else if (grupo(); as grupoActual) {
-    <header class="portada">
+    <header class="portada" [class.tiene-imagen]="!!grupoActual.imagen">
+      @if (grupoActual.imagen) {
+        <img [src]="grupoActual.imagen" [alt]="'Portada de ' + grupoActual.nombre" class="portada-imagen" />
+      }
+
       <div class="portada-contenido">
         <span class="etiqueta">Creado el {{ formatearFecha(grupoActual.fecha_creacion) }}</span>
         <h1>{{ grupoActual.nombre }}</h1>
@@ -46,6 +50,39 @@
         </div>
 
         <div class="acciones-pertenencia">
+          <!-- Botones de visualización y descarga de portada -->
+          @if (grupoActual.imagen) {
+            <button type="button" class="boton-secundario" (click)="abrirPortada()" title="Ver portada completa">
+              <i class="bi bi-box-arrow-up-right"></i>
+              Ver portada
+            </button>
+            <button type="button" class="boton-secundario" (click)="descargarPortada()" title="Descargar imagen">
+              <i class="bi bi-download"></i>
+              Descargar
+            </button>
+          }
+
+          <!-- Botones de administración de portada (líder o admin) -->
+          @if (puedeEditarPortada()) {
+            <button type="button" class="boton-secundario" (click)="conmutarGestionPortada()">
+              <i class="bi bi-image"></i>
+              {{ mostrarGestionPortada() ? 'Cerrar panel portada' : (grupoActual.imagen ? 'Cambiar portada' : 'Subir portada') }}
+            </button>
+
+            @if (grupoActual.imagen) {
+              <button
+                type="button"
+                class="boton-peligro"
+                [disabled]="procesando()"
+                (click)="eliminarPortadaDirecta()"
+                title="Eliminar portada actual"
+              >
+                <i class="bi bi-trash"></i>
+                Eliminar portada
+              </button>
+            }
+          }
+
           @if (esLider()) {
             <!-- Solo el líder puede editar y eliminar -->
             <a class="boton-principal" [routerLink]="['/grupos', grupoActual._id, 'editar']">
@@ -66,6 +103,20 @@
         </div>
       </div>
     </header>
+
+    <!-- Panel interactivo de gestión de portada (Entrega 4 - Archivos) -->
+    @if (mostrarGestionPortada()) {
+      <div class="panel-gestion-portada">
+        <app-subir-portada
+          [grupoId]="grupoActual._id"
+          [imagenActual]="grupoActual.imagen"
+          [puedeEditar]="puedeEditarPortada()"
+          (portadaActualizada)="onPortadaActualizada($event)"
+          (portadaEliminada)="onPortadaEliminada()"
+          (cerrar)="mostrarGestionPortada.set(false)"
+        />
+      </div>
+    }
 
     <nav class="tabs" aria-label="Secciones del grupo">
       <button
@@ -275,7 +326,7 @@
               } @empty {
                 <div class="estado-vacio">
                   <h3>Todavía no hay mensajes</h3>
-                  <p>Saluda a tu equipo para comenzar.</p>
+                  <p>Saluda a tu equipo para comenzar la conversación en vivo.</p>
                 </div>
               }
             </div>
@@ -292,7 +343,11 @@
                   placeholder="Escribe un mensaje..."
                   autocomplete="off"
                 />
-                <button type="submit" class="boton-principal" [disabled]="!nuevoMensaje.trim()">
+                <button
+                  type="submit"
+                  class="boton-principal"
+                  [disabled]="!nuevoMensaje.trim()"
+                >
                   Enviar
                 </button>
               </div>

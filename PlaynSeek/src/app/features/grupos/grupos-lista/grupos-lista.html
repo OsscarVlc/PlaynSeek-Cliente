@@ -79,9 +79,13 @@
       @for (grupo of grupos(); track grupo._id; let i = $index) {
         <article class="grupo-card">
           <div [class]="'portada ' + claseTono(i)">
-            <span class="simbolo" aria-hidden="true">
-              {{ grupo.nombre.charAt(0) }}
-            </span>
+            @if (grupo.imagen) {
+              <img [src]="grupo.imagen" [alt]="'Portada de ' + grupo.nombre" loading="lazy" />
+            } @else {
+              <span class="simbolo" aria-hidden="true">
+                {{ grupo.nombre.charAt(0) }}
+              </span>
+            }
           </div>
 
           <div class="card-contenido">

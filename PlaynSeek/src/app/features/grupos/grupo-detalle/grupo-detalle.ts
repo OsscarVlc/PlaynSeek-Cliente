@@ -11,6 +11,7 @@ import { Notification } from '@core/services/notification';
 import { Grupo } from '@shared/models/grupo';
 
 import { HasRole } from '@shared/directives/has-role';
+import { SubirPortada } from '../subir-portada/subir-portada';
 
 type TabGrupo = 'posts' | 'chat' | 'integrantes';
 type AccionIntegrante = 'transferir' | 'expulsar';
@@ -49,7 +50,7 @@ interface ConfirmacionIntegrante {
 
 @Component({
   selector: 'app-grupo-detalle',
-  imports: [RouterLink, FormsModule, DatePipe, HasRole],
+  imports: [RouterLink, FormsModule, DatePipe, HasRole, SubirPortada],
   templateUrl: './grupo-detalle.html',
   styleUrl: './grupo-detalle.scss',
 })
@@ -69,6 +70,10 @@ export class GrupoDetalle implements OnInit {
   readonly cargando = signal(true);
   readonly error = signal(false);
   readonly noEncontrado = signal(false);
+
+  // Gestión de portada (Entrega 4 - Archivos)
+  readonly mostrarGestionPortada = signal(false);
+  readonly puedeEditarPortada = computed(() => this.esLider() || this.auth.tieneRol(['administrador']));
 
   // true mientras una acción (unirse, salir, eliminar...) viaja al back
   readonly procesando = signal(false);
@@ -106,7 +111,6 @@ export class GrupoDetalle implements OnInit {
   private readonly publicaciones = signal<PublicacionDemo[]>([]);
   private readonly mensajes = signal<MensajeDemo[]>([]);
 
-  
   readonly postsDelGrupo = computed(() =>
     this.publicaciones().filter((post) => post.grupoId === this.grupo()?._id),
   );
@@ -168,6 +172,66 @@ export class GrupoDetalle implements OnInit {
 
   seleccionarTab(tab: TabGrupo): void {
     this.tabActual.set(tab);
+  }
+
+  // --- Manejo de Portada de Grupo (Entrega 4 - Archivos) ---
+
+  conmutarGestionPortada(): void {
+    this.mostrarGestionPortada.update((abierto) => !abierto);
+  }
+
+  onPortadaActualizada(grupoActualizado: Grupo): void {
+    this.grupo.set(grupoActualizado);
+    this.mostrarGestionPortada.set(false);
+  }
+
+  onPortadaEliminada(): void {
+    this.grupo.update((actual) => (actual ? { ...actual, imagen: null } : null));
+    this.mostrarGestionPortada.set(false);
+  }
+
+  abrirPortada(): void {
+    const url = this.grupo()?.imagen;
+    if (url) {
+      window.open(url, '_blank', 'noopener,noreferrer');
+    }
+  }
+
+  descargarPortada(): void {
+    const url = this.grupo()?.imagen;
+    if (!url) return;
+    const enlace = document.createElement('a');
+    enlace.href = url;
+    enlace.download = `portada-${this.grupo()?.nombre || 'grupo'}.jpg`;
+    enlace.target = '_blank';
+    document.body.appendChild(enlace);
+    enlace.click();
+    document.body.removeChild(enlace);
+  }
+
+  async eliminarPortadaDirecta(): Promise<void> {
+    const confirmado = await this.confirmar.pedirAsync(
+      '¿Deseas eliminar la portada de este grupo? Se volverá al degradado temático.',
+      'Eliminar portada',
+    );
+    if (!confirmado) return;
+
+    this.procesando.set(true);
+    this.grupoApi.eliminarPortada(this.grupoId).subscribe({
+      next: () => {
+        this.notificacion.exito('Portada eliminada correctamente');
+        this.onPortadaEliminada();
+        this.procesando.set(false);
+      },
+      error: (err: HttpErrorResponse) => {
+        this.procesando.set(false);
+        if (err.status === 403) {
+          this.notificacion.error('No tienes permisos de líder o administrador para eliminar la portada (403)');
+        } else {
+          this.notificacion.error(err.error?.message || 'Error al eliminar portada');
+        }
+      },
+    });
   }
 
 
