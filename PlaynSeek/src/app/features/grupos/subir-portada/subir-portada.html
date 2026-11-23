@@ -1,0 +1,176 @@
+<div class="portada-panel">
+  <div class="panel-cabecera">
+    <div>
+      <h3 class="panel-titulo">Portada del grupo</h3>
+      <p class="panel-subtitulo">Visualiza, descarga o actualiza la imagen distintiva de tu comunidad.</p>
+    </div>
+    <button type="button" class="btn-cerrar" (click)="cerrar.emit()" aria-label="Cerrar panel">
+      <i class="bi bi-x-lg"></i>
+    </button>
+  </div>
+
+  <!-- SECCIÓN 1: Portada actual -->
+  <div class="seccion-actual">
+    <span class="seccion-label">Portada actual</span>
+
+    @if (imagenActual()) {
+      <div class="preview-actual-card">
+        <img [src]="imagenActual()" alt="Portada actual del grupo" class="img-actual" />
+        <div class="acciones-actual">
+          <button type="button" class="btn-accion" (click)="abrirEnNuevaPestana()" title="Abrir imagen completa">
+            <i class="bi bi-box-arrow-up-right"></i>
+            Abrir
+          </button>
+          <button type="button" class="btn-accion" (click)="descargar()" title="Descargar imagen">
+            <i class="bi bi-download"></i>
+            Descargar
+          </button>
+
+          @if (puedeEditar()) {
+            <button
+              type="button"
+              class="btn-accion btn-peligro"
+              [disabled]="eliminando() || subiendo()"
+              (click)="eliminarPortada()"
+              title="Eliminar portada"
+            >
+              @if (eliminando()) {
+                <span class="spinner-border spinner-border-sm" role="status"></span>
+                Eliminando...
+              } @else {
+                <i class="bi bi-trash"></i>
+                Eliminar
+              }
+            </button>
+          }
+        </div>
+      </div>
+    } @else {
+      <!-- Estado vacío: sin portada -->
+      <div class="estado-sin-portada">
+        <div class="muestra-degradado" aria-hidden="true"></div>
+        <div class="texto-sin-portada">
+          <p class="titulo-vacio">Sin portada personalizada</p>
+          <p class="descripcion-vacio">
+            Este grupo actualmente utiliza el degradado temático predeterminado del sistema.
+          </p>
+        </div>
+      </div>
+    }
+  </div>
+
+  <!-- SECCIÓN 2: Zona de carga (solo líder o admin) -->
+  @if (puedeEditar()) {
+    <div class="seccion-subida">
+      <span class="seccion-label">Subir nueva imagen</span>
+
+      <!-- Dropzone interactivo (Drag & Drop + Input File) -->
+      <div
+        class="dropzone"
+        [class.arrastrando]="arrastrandoSobre()"
+        [class.con-archivo]="archivoSeleccionado() !== null"
+        (dragover)="onDragOver($event)"
+        (dragleave)="onDragLeave($event)"
+        (drop)="onDrop($event)"
+        (click)="fileInput.click()"
+        role="button"
+        tabindex="0"
+        (keyup.enter)="fileInput.click()"
+      >
+        <input
+          #fileInput
+          type="file"
+          class="visually-hidden"
+          accept="image/jpeg,image/png,image/webp"
+          (change)="onFileSelected($event)"
+        />
+
+        <div class="dropzone-contenido">
+          <i class="bi bi-cloud-arrow-up icono-subida"></i>
+          <p class="dropzone-texto">
+            <strong>Haz clic para examinar</strong> o arrastra y suelta tu archivo aquí
+          </p>
+          <p class="dropzone-requisitos">
+            Solo imágenes JPG, PNG o WebP. Tamaño máximo: 5 MB.
+          </p>
+        </div>
+      </div>
+
+      <!-- Alerta de validación o error -->
+      @if (mensajeError()) {
+        <div class="alerta-error" role="alert">
+          <i class="bi bi-exclamation-triangle-fill"></i>
+          <span>{{ mensajeError() }}</span>
+        </div>
+      }
+
+      <!-- Vista previa del archivo seleccionado -->
+      @if (archivoSeleccionado(); as archivo) {
+        <div class="preview-seleccion-card">
+          <div class="preview-info">
+            @if (vistaPrevia()) {
+              <img [src]="vistaPrevia()" alt="Vista previa" class="miniatura" />
+            }
+            <div class="archivo-datos">
+              <span class="archivo-nombre">{{ archivo.name }}</span>
+              <span class="archivo-detalles">{{ tamanoFormateado() }} • {{ archivo.type }}</span>
+            </div>
+          </div>
+
+          <!-- Barra de progreso durante la subida -->
+          @if (subiendo()) {
+            <div class="progreso-zona">
+              <div class="progreso-barra-fondo">
+                <div
+                  class="progreso-barra-relleno"
+                  [style.width.%]="porcentajeProgreso()"
+                  role="progressbar"
+                  [attr.aria-valuenow]="porcentajeProgreso()"
+                  aria-valuemin="0"
+                  aria-valuemax="100"
+                ></div>
+              </div>
+              <span class="progreso-porcentaje">{{ porcentajeProgreso() }}% completado</span>
+            </div>
+          }
+
+          <!-- Botones de acción para la subida -->
+          <div class="botones-subida">
+            @if (subiendo()) {
+              <button
+                type="button"
+                class="btn-cancelar-subida"
+                (click)="cancelarSubida()"
+              >
+                <i class="bi bi-x-circle"></i>
+                Cancelar subida
+              </button>
+            } @else {
+              <button
+                type="button"
+                class="btn-subir"
+                (click)="subir()"
+              >
+                <i class="bi bi-check2-circle"></i>
+                Guardar portada
+              </button>
+
+              <button
+                type="button"
+                class="btn-limpiar"
+                (click)="limpiarSeleccion()"
+              >
+                Descartar
+              </button>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  } @else {
+    <p class="aviso-permisos">
+      <i class="bi bi-info-circle"></i>
+      Solo el líder del grupo o un administrador tienen permiso para cambiar o eliminar la portada.
+    </p>
+  }
+</div>
