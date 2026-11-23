@@ -42,3 +42,15 @@ __screenshots__/
 # System files
 .DS_Store
 Thumbs.db
+
+# Artefactos locales de entrega y consignas (NUNCA en git)
+capturas/
+evidencias/
+EVIDENCIAS.md
+TASK_SPEC.md
+*.png
+*.pdf
+*.docx
+HARNESS_FEEDBACK.json
+.agent_prompt.md
+.execution_trace.md
