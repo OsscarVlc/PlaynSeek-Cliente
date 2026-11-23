@@ -3,9 +3,9 @@
 // Todas las llamadas HTTP de grupos viven aqui
 // ============================================================
 
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpEvent, HttpEventType, HttpParams, HttpRequest } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { Observable, map } from 'rxjs';
+import { Observable, filter, map } from 'rxjs';
 
 import { environment } from '@env/environment';
 import { DatosGrupo, Grupo } from '@shared/models/grupo';
@@ -20,6 +20,15 @@ interface RespuestaCrearGrupo {
 // Lo que responde el back al eliminar
 interface RespuestaMensaje {
   message: string;
+}
+
+export type EventoSubidaPortada =
+  | { tipo: 'progreso'; porcentaje: number }
+  | { tipo: 'completado'; grupo: Grupo };
+
+interface RespuestaPortada {
+  message: string;
+  grupo: Grupo;
 }
 
 @Injectable({
@@ -97,6 +106,39 @@ export class GrupoApi {
     return this.http.patch<RespuestaMensaje>(this.url + '/' + id + '/transferir-liderazgo', {
       nuevoLiderId: nuevoLiderId,
     });
+  }
+
+  // POST /grupo/:id/portada  (sube imagen con progreso; reportProgress: true y observe: 'events')
+  subirPortada(id: string, archivo: File): Observable<EventoSubidaPortada> {
+    const formData = new FormData();
+    formData.append('imagen', archivo);
+
+    const req = new HttpRequest('POST', `${this.url}/${id}/portada`, formData, {
+      reportProgress: true,
+    });
+
+    return this.http.request<RespuestaPortada>(req).pipe(
+      map((evento: HttpEvent<RespuestaPortada>) => {
+        if (evento.type === HttpEventType.UploadProgress) {
+          const total = evento.total ?? archivo.size;
+          const porcentaje = total > 0 ? Math.round((100 * evento.loaded) / total) : 0;
+          return { tipo: 'progreso' as const, porcentaje: Math.min(porcentaje, 99) };
+        }
+        if (evento.type === HttpEventType.Response) {
+          const grupoActualizado = evento.body?.grupo ?? (evento.body as unknown as Grupo);
+          return { tipo: 'completado' as const, grupo: grupoActualizado };
+        }
+        return { tipo: 'progreso' as const, porcentaje: 0 };
+      }),
+      filter((evento): evento is EventoSubidaPortada => {
+        return evento.tipo === 'completado' || evento.porcentaje > 0;
+      }),
+    );
+  }
+
+  // DELETE /grupo/:id/portada  (elimina la imagen de portada; solo lider o admin)
+  eliminarPortada(id: string): Observable<RespuestaMensaje & { grupo?: Grupo }> {
+    return this.http.delete<RespuestaMensaje & { grupo?: Grupo }>(`${this.url}/${id}/portada`);
   }
 
   // Arma el cuerpo con SOLO nombre y descripcion

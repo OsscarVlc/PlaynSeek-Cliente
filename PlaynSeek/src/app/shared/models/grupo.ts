@@ -15,6 +15,7 @@ export interface Grupo {
   lider_id: string; // id del usuario que creó y administra el grupo
   integrantes?: string[]; // ids de los usuarios que pertenecen al grupo
   activo?: boolean; // false = grupo "eliminado" (soft delete)
+  imagen?: string | null; // URL de la imagen de portada del grupo
 
   // --- Campos extra SOLO para el front (la API actual no los devuelve) ---
   lider?: UsuarioResumen;
